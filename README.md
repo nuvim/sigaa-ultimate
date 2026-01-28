@@ -4,24 +4,41 @@
 
 > ⚠️ **Nota:** Projeto independente e open-source.
 
-## 📦 Instalação Rápida
+## 📦 Instalação e Downloads
 
-Para utilizar, você precisa da extensão **Tampermonkey** instalada no seu navegador. Clique nos links abaixo para instalar cada módulo diretamente.
+Para garantir que você esteja sempre utilizando a versão mais estável e segura, os downloads agora estão centralizados na página de **Releases** do GitHub.
 
-| Módulo | Função | 📥 Instalar (Raw) |
-| :--- | :--- | :---: |
-| **Login** | Nova tela de login minimalista e imersiva. | [**sigaa-login.user.js**](https://github.com/nuvim/sigaa-ultimate/raw/main/sigaa-login.user.js) |
-| **Landing** | Página inicial limpa, sem menus antigos. | [**sigaa-landing.user.js**](https://github.com/nuvim/sigaa-ultimate/raw/main/sigaa-landing.user.js) |
-| **Portal** | Painel do aluno completo com Sidebar e Cards. | [**sigaa-portal.user.js**](https://github.com/nuvim/sigaa-ultimate/raw/main/sigaa-portal.user.js) |
+### 🛠️ Pré-requisitos e Configuração
 
-## 🚀 Como Usar
+Para que o **SIGAA Ultimate** funcione sem interrupções, siga estes passos antes de instalar os scripts:
 
-1.  Instale o **Tampermonkey** (Chrome, Edge, Firefox, Opera).
-2.  Clique nos links da coluna **"Instalar (Raw)"** na tabela acima.
-3.  Uma aba do Tampermonkey abrirá; clique em **Instalar**.
-4.  Acesse o SIGAA e aproveite o novo visual.
+1.  **Instale o Gerenciador:** Tenha a extensão **Tampermonkey** instalada (Chrome, Edge, Firefox, Opera).
+2.  **Ative o Modo do Desenvolvedor (Importante):**
+    * Em navegadores como **Chrome** ou **Edge**, vá em *Gerenciar Extensões* (`chrome://extensions`).
+    * No canto superior direito, ative a chave **"Modo do desenvolvedor"** (Developer mode).
+    * *Isso impede que o navegador bloqueie o script por considerá-lo uma "fonte externa".*
+3.  **Conceda Permissões:**
+    * Ao instalar ou executar o script pela primeira vez, o Tampermonkey pode solicitar permissão para acessar/modificar dados em `si3.ufc.br`.
+    * Clique em **"Permitir sempre"** (Allow always). Sem isso, o novo visual não será aplicado.
+
+### Como Baixar
+1. Clique no link abaixo para acessar a página de versões.
+2. Escolha a versão desejada.
+3. Na seção "Assets", clique nos arquivos `.user.js` que deseja instalar.
+
+[👉 **ACESSAR PÁGINA DE DOWNLOADS (RELEASES)**](../../releases)
+
+---
+
+## ✨ Módulos do Pacote
+
+Ao acessar a página de releases, você encontrará os seguintes módulos:
+
+* **🔐 Login Ultimate:** Uma tela de login totalmente redesenhada, com suporte a temas (Claro/Escuro), inputs inteligentes e links de acesso rápido.
+* **🏠 Landing Clean:** Página inicial pública modernizada, sem menus quebrados e com navegação fluida.
+* **🎓 Portal do Discente:** O painel principal transformado. Inclui Sidebar lateral, Grade Curricular visual, Cards de turmas e modo escuro nativo.
 
 ---
 
 ### 📝 Histórico de Versões
-Para ver capturas de tela (screenshots), detalhes das mudanças e o histórico completo de atualizações, consulte a aba **[Releases](../../releases)** deste repositório.
+Para ver capturas de tela (screenshots), detalhes técnicos das mudanças e o histórico completo, consulte a aba **[Releases](../../releases)**.
