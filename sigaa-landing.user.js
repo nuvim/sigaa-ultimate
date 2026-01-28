@@ -16,6 +16,7 @@
 
     const head = document.head;
     
+    // importa fonte bonita e icones
     const fontLink = document.createElement('link');
     fontLink.rel = 'stylesheet';
     fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap';
@@ -25,12 +26,14 @@
     iconScript.src = 'https://unpkg.com/@phosphor-icons/web';
     head.appendChild(iconScript);
 
+    // pega os links e menus da pagina original
     function scrapeItems() {
         const groups = {
             portais: [],
             modulos: []
         };
 
+        // dicionario pra escolher icone baseado no nome
         const iconMap = {
             'graduacao': 'ph-student',
             'pos_graduacao': 'ph-graduation-cap',
@@ -68,6 +71,7 @@
             return 'ph-squares-four';
         }
 
+        // varre a lista de portais
         document.querySelectorAll('#portais ul li').forEach(li => {
             const link = li.querySelector('a');
             const span = li.querySelector('.texto');
@@ -85,6 +89,7 @@
             });
         });
 
+        // varre a lista de modulos
         document.querySelectorAll('#modulos ul li').forEach(li => {
             const link = li.querySelector('a');
             const span = li.querySelector('.texto');
@@ -107,6 +112,7 @@
 
     const data = scrapeItems();
 
+    // estilos css da landing page
     const css = `
         body, html {
             margin: 0;
@@ -116,6 +122,7 @@
             background-color: #f8fafc;
         }
         
+        // esconde tudo da pagina original
         body > table, #container, #cabecalho, #rodape, #barra-governo, .tabela {
             display: none !important;
         }
@@ -337,6 +344,7 @@
 
     const portaisFiltrados = data.portais.filter(p => !p.text.toLowerCase().includes('discente'));
 
+    // constroi o html da nova pagina inicial
     const page = document.createElement('div');
     page.innerHTML = `
         <nav class="navbar">

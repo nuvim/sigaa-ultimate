@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         SIGAA Ultimate 3 - Portal do Discente
+// @name         SIGAA Ultimate 2.0 - Portal do Discente
 // @namespace    http://tampermonkey.net/
-// @version      1.1
-// @description  Painel do Discente modernizado com Sidebar, Cards e correções visuais.
+// @version      2.0-beta1
+// @description  v2.0 Beta: Grade Estável (07h-22h), Alto Contraste e PDF Nativo.
 // @author       Gusttavo
 // @match        *://si3.ufc.br/sigaa/*
 // @exclude      *://si3.ufc.br/sigaa/verTelaLogin.do*
@@ -19,19 +19,20 @@
 (function() {
     'use strict';
 
+    // trava de seguranca: se for login ou pagina publica, nao roda
     if (window.location.href.includes("verTelaLogin") || window.location.href.includes("paginaInicial") || document.querySelector("#loginFormMask")) return;
     if (window.self !== window.top) return;
 
+    // verifica se estamos no painel principal ou pagina interna
     const isDashboard = document.querySelector("#agenda-docente") !== null;
     const isInternalPage = document.querySelector("#cabecalho") !== null || document.querySelector("#info-usuario") !== null;
     const isErrorPage = document.getElementById('painel-erro') !== null || document.body.innerText.includes("Comportamento Inesperado");
 
-    if (isErrorPage) {
-        localStorage.removeItem('sigaa_plus_cache');
-        return;
-    }
+    // se deu erro no sigaa, limpa o cache pra nao travar
+    if (isErrorPage) { localStorage.removeItem('sigaa_plus_cache'); return; }
     if (!isDashboard && !isInternalPage) return;
 
+    // icones svg (figurinhas)
     const icons = {
         student: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M231.9 113.4L135.9 56.7a15.8 15.8 0 0 0-15.8 0L24.1 113.4a7.9 7.9 0 0 0 0 13.6l44.3 26.1v49.3a16 16 0 0 0 8.2 14l46.2 24.3a15.6 15.6 0 0 0 10.4 0l46.2-24.3a16 16 0 0 0 8.2-14v-49.3l24.4-14.4v39.7a8 8 0 0 0 16 0v-48a8 8 0 0 0-4.1-7m-103.9 98l-46.2-24.3a.6.6 0 0 1-.3-.3v-42l46.5 27.4Zm54.7-24.6l-46.2 24.3l-.5-8.4l46.6-27.4Zm-54.7-41.2l-86.5-51l86.5-51.1l86.5 51.1Z"/></svg>`,
         class: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M245.2 65.6l-20-13.3a15.9 15.9 0 0 0-17.7 0l-72 48a15.9 15.9 0 0 0-7.1 13.3v42.1l-68.4-45.6V68a8 8 0 0 0-16 0v48a8 8 0 0 0 3.6 6.7l72 48a16.1 16.1 0 0 0 17.8 0l72-48a16.1 16.1 0 0 0 7.1-13.4v-38.4l20 13.3a8 8 0 0 0 8.8-13.3m-108.9 93.4l-64-42.7l64-42.7l64 42.7Z"/></svg>`,
@@ -43,25 +44,25 @@
         user: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M230.9 206.6c-20.9-33.8-54.3-55-91.4-58.1a55.9 55.9 0 1 0-23 0c-37.1 3.1-70.5 24.3-91.4 58.1a8 8 0 1 0 13.6 8.4C55.7 187.7 85 168 128 168s72.3 19.7 89.3 47a8 8 0 1 0 13.6-8.4"/></svg>`,
         edit: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M227.3 73.4L182.6 28.7a16 16 0 0 0-22.6 0L36.7 152.1a15.9 15.9 0 0 0-4.7 11.3v44.6a8 8 0 0 0 8 8h44.6a15.9 15.9 0 0 0 11.3-4.7l123.4-123.4a16 16 0 0 0 0-22.6"/></svg>`,
         chevronDown: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M213.7 101.7l-80 80a8.2 8.2 0 0 1-11.4 0l-80-80a8.1 8.1 0 0 1 11.4-11.4L128 164.7l74.3-74.4a8.1 8.1 0 0 1 11.4 11.4Z"/></svg>`,
-        books: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M224 48v136a16 16 0 0 1-16 16H88a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h120a16 16 0 0 1 16 16M88 48v136h120V48ZM40 64a8 8 0 0 0-8 8v136a32.1 32.1 0 0 0 32 32h120a8 8 0 0 0 0-16H64a16 16 0 0 1-16-16V72a8 8 0 0 0-8-8"/></svg>`
+        books: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M224 48v136a16 16 0 0 1-16 16H88a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h120a16 16 0 0 1 16 16M88 48v136h120V48ZM40 64a8 8 0 0 0-8 8v136a32.1 32.1 0 0 0 32 32h120a8 8 0 0 0 0-16H64a16 16 0 0 1-16-16V72a8 8 0 0 0-8-8"/></svg>`,
+        table: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 256 256"><path fill="currentColor" d="M224 48H32a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h192a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16Zm0 144H32V64h192v128Zm-32-80v48a8 8 0 0 1-16 0v-48a8 8 0 0 1 16 0Zm-64 0v48a8 8 0 0 1-16 0v-48a8 8 0 0 1 16 0Zm-64 0v48a8 8 0 0 1-16 0v-48a8 8 0 0 1 16 0Z"/></svg>`,
+        printer: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M216 40H40a16 16 0 0 0-16 16v104a16 16 0 0 0 16 16h16v32a16 16 0 0 0 16 16h112a16 16 0 0 0 16-16v-32h16a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16m-48 176H88v-32h80Zm24-48H64V56h152Zm-32-88a12 12 0 1 1-12 12a12 12 0 0 1 12-12"/></svg>`
     };
 
+    // funcoes pra deixar o nome bonito e encurtar
     function capitalizeName(name) { return name.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '); }
-    
-    function getShortName(fullName) {
-        const parts = fullName.split(' ');
-        if (parts.length <= 1) return fullName;
-        return parts[0] + ' ' + parts[1];
-    }
+    function getShortName(fullName) { const parts = fullName.split(' '); return parts.length <= 1 ? fullName : parts[0] + ' ' + parts[1]; }
 
+    // data de hoje
     const today = new Date();
-    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const dateString = today.toLocaleDateString('pt-BR', dateOptions);
+    const dateString = today.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const capitalizedDate = dateString.charAt(0).toUpperCase() + dateString.slice(1);
 
+    // pega dados salvos no navegador
     let aluno = JSON.parse(localStorage.getItem('sigaa_plus_cache') || '{}');
     let carteirinha = { matricula: "---", curso: "---", nivel: "---", status: "---", email: "---", entrada: "---" };
 
+    // se tiver no painel, raspa os dados da tabela feia
     if (isDashboard) {
         try {
             const tds = document.querySelectorAll("#agenda-docente td");
@@ -83,56 +84,210 @@
             aluno.avatar = elFoto ? elFoto.src : aluno.avatar;
             aluno.semestre = elSemestre ? elSemestre.innerText.trim() : aluno.semestre;
             aluno.dados = carteirinha;
-
             localStorage.setItem('sigaa_plus_cache', JSON.stringify(aluno));
         } catch(e) {}
-    } else {
-        carteirinha = aluno.dados || carteirinha;
+    } else { carteirinha = aluno.dados || carteirinha; }
+
+    function cleanText(text) {
+        return text.replace(/\(\d{2}\/\d{2}\/\d{4}.*?\)/g, "").trim();
     }
 
+    // cria os badges bonitinhos de horario nos cards
     function formatHorarios(rawText) {
-        let cleanText = rawText.replace(/\(\d{2}\/\d{2}\/\d{4}.*?\)/g, "").trim();
+        let text = cleanText(rawText);
         const dias = ["SEG", "TER", "QUA", "QUI", "SEX", "SAB"];
         let parts = [];
         dias.forEach(dia => {
             const regex = new RegExp(`${dia}\\s\\d{2}:\\d{2}-\\d{2}:\\d{2}`, "g");
-            const matches = cleanText.match(regex);
+            const matches = text.match(regex);
             if (matches) parts.push(...matches);
         });
         return parts.length === 0 ? `<div class="horario-badge">Horário não definido</div>` : parts.map(h => `<div class="horario-badge">${icons.clock} <span>${h}</span></div>`).join("");
     }
 
+    // --- LOGICA DA GRADE VISUAL ---
+    const turmasData = [];
+    const diasSemana = ["SEG", "TER", "QUA", "QUI", "SEX"];
+    
+    // transforma texto tipo "SEG 14:00-16:00" em dados pra grade
+    function parseToGrid(horarioStr, nomeMateria, cor) {
+        const text = cleanText(horarioStr);
+        const regex = /(SEG|TER|QUA|QUI|SEX|SAB|DOM)[\s\.]*(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/gi;
+        
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+            turmasData.push({
+                dia: match[1].toUpperCase(),
+                h_inicio: parseInt(match[2]),
+                m_inicio: parseInt(match[3]),
+                h_fim: parseInt(match[4]),
+                m_fim: parseInt(match[5]),
+                nome: nomeMateria,
+                cor: cor
+            });
+        }
+    }
+
+    // desenha o modal da grade
+    function criarModalGrade() {
+        const modal = document.createElement('div');
+        modal.id = 'modal-grade';
+        modal.style.cssText = `display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(3px);`;
+        
+        // configuracoes de tamanho (fixo das 07 as 22h)
+        const startHour = 7;
+        const endHour = 22; 
+        
+        const totalMinutes = (endHour - startHour) * 60;
+        const containerHeightPx = (endHour - startHour) * 50; 
+
+        // cores pra ficar legivel
+        const borderColor = '#cbd5e1'; 
+        const textColor = '#334155'; 
+
+        // desenha as linhas do fundo
+        let gridLinesHTML = '';
+        for(let h = startHour; h < endHour; h++) {
+            gridLinesHTML += `<div style="flex:1; border-bottom:1px solid ${borderColor}; box-sizing:border-box; width:100%; min-height:50px;"></div>`;
+        }
+
+        // desenha a coluna dos horarios na esquerda
+        let timeLabelsHTML = '';
+        for(let h = startHour; h < endHour; h++) {
+            timeLabelsHTML += `<div style="flex:1; border-bottom:1px solid ${borderColor}; box-sizing:border-box; color:${textColor}; font-weight:600; font-size:0.75rem; padding:5px; text-align:right; display:flex; align-items:flex-end; justify-content:flex-end; padding-bottom:0; min-height:50px;">${h+1}:00</div>`;
+        }
+
+        // monta as colunas dos dias (seg a sex)
+        let daysColsHTML = diasSemana.map(dia => {
+            const aulasDia = turmasData.filter(t => t.dia === dia);
+            
+            // desenha os quadradinhos das aulas usando %
+            let blocosHTML = aulasDia.map(aula => {
+                const startMinutes = (aula.h_inicio * 60) + aula.m_inicio;
+                const endMinutes = (aula.h_fim * 60) + aula.m_fim;
+                const gridStartMinutes = startHour * 60;
+                
+                const topPercent = ((startMinutes - gridStartMinutes) / totalMinutes) * 100;
+                const heightPercent = ((endMinutes - startMinutes) / totalMinutes) * 100;
+
+                const labelInicio = `${String(aula.h_inicio).padStart(2,'0')}:${String(aula.m_inicio).padStart(2,'0')}`;
+                const labelFim = `${String(aula.h_fim).padStart(2,'0')}:${String(aula.m_fim).padStart(2,'0')}`;
+
+                return `<div style="
+                    position: absolute;
+                    top: ${topPercent}%;
+                    left: 2%;
+                    width: 96%;
+                    height: ${heightPercent}%;
+                    background: ${aula.cor};
+                    border-radius: 6px;
+                    color: white;
+                    font-size: 0.7rem;
+                    padding: 4px 6px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                    overflow: hidden;
+                    z-index: 10;
+                    border-left: 3px solid rgba(0,0,0,0.2);
+                    display:flex; flex-direction:column; justify-content:center;
+                    box-sizing: border-box;
+                ">
+                    <div style="font-weight:700; line-height:1.2; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${aula.nome}</div>
+                    <div style="opacity:0.9; font-size:0.65rem; margin-top:2px;">${labelInicio} - ${labelFim}</div>
+                </div>`;
+            }).join('');
+
+            return `<div style="position:relative; background:white; border-left:1px solid ${borderColor}; min-width:100px; height:100%;">
+                <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; z-index:0;">${gridLinesHTML}</div>
+                ${blocosHTML}
+            </div>`;
+        }).join('');
+
+        // monta o html final da janela (modal)
+        let gridHTML = `<div style="background:white; width:95%; max-width:1600px; height:90vh; border-radius:16px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.3);">
+            <div style="padding:15px 25px; border-bottom:1px solid ${borderColor}; display:flex; justify-content:space-between; align-items:center; background:#f8fafc;">
+                <h2 style="margin:0; font-size:1.3rem; color:#1e293b; display:flex; align-items:center; gap:10px;">${icons.table} Grade Curricular</h2>
+                <div style="display:flex; gap:10px;">
+                    <button id="btn-imprimir-grade" style="background:white; border:1px solid #cbd5e1; border-radius:8px; padding:8px 12px; cursor:pointer; color:#475569; display:flex; align-items:center; gap:6px; font-weight:600; font-size:0.85rem; transition:0.2s;">${icons.printer} Salvar PDF</button>
+                    <button id="btn-fechar-modal" style="background:none; border:none; font-size:2rem; cursor:pointer; color:#64748b; line-height:1;">&times;</button>
+                </div>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: 50px repeat(5, 1fr); background:white; border-bottom:2px solid ${borderColor};">
+                <div style="padding:10px;"></div>
+                ${diasSemana.map(d => `<div style="padding:12px; text-align:center; font-weight:800; color:${textColor}; font-size:0.9rem;">${d}</div>`).join('')}
+            </div>
+
+            <div style="flex:1; overflow-y:auto; position:relative;">
+                <div style="display:grid; grid-template-columns: 50px repeat(5, 1fr); height:${containerHeightPx}px;">
+                    <div style="background:#f8fafc; border-right:1px solid ${borderColor}; display:flex; flex-direction:column;">
+                        ${timeLabelsHTML}
+                    </div>
+                    ${daysColsHTML}
+                </div>
+            </div>
+        </div>`;
+        
+        modal.innerHTML = gridHTML;
+        document.body.appendChild(modal);
+        
+        // botoes fechar e imprimir
+        document.getElementById('btn-fechar-modal').onclick = () => modal.style.display = 'none';
+        modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+        
+        document.getElementById('btn-imprimir-grade').addEventListener('click', () => {
+            window.print();
+        });
+    }
+
     const triggerMeusDados = () => { const links = document.querySelectorAll('a'); for (const a of links) { if (a.innerText.includes("Meus Dados Pessoais")) { a.click(); return; } } alert("Opção indisponível."); };
     const triggerEditarPerfil = () => { const link = document.querySelector('a.perfil'); if (link) link.click(); else alert("Opção indisponível."); };
 
+    // estilos CSS (menu escuro, badges, grade e impressao)
     GM_addStyle(`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif !important; background-color: #f8fafc !important; }
         ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
         
-        #menu-dropdown .ThemeOfficeSubMenu, #menu-dropdown table, #menu-dropdown tbody, #menu-dropdown tr, #menu-dropdown td { background-color: #0f172a !important; }
-        #menu-dropdown .ThemeOfficeMenuItem { background-color: #0f172a !important; color: #cbd5e1 !important; padding: 8px 15px !important; border: none !important; font-family: 'Inter' !important; }
-        #menu-dropdown .ThemeOfficeMenuItemHover { background-color: #3b82f6 !important; color: white !important; }
-        
-        #menu-dropdown { 
-            background-color: #0f172a !important; 
-            border: 1px solid #334155 !important;
-        }
-        #menu-dropdown * {
-            background-color: #0f172a !important; 
-            color: #cbd5e1 !important;
-            border-color: #334155 !important;
-        }
-        #menu-dropdown .ThemeOfficeMenuItemHover, 
-        #menu-dropdown .ThemeOfficeMenuItemHover * { 
-            background-color: #3b82f6 !important; 
-            color: white !important; 
-        }
+        #menu-dropdown { background-color: #0f172a !important; border: 1px solid #334155 !important; }
+        #menu-dropdown * { background-color: #0f172a !important; color: #cbd5e1 !important; border-color: #334155 !important; }
+        #menu-dropdown .ThemeOfficeMenuItemHover, #menu-dropdown .ThemeOfficeMenuItemHover * { background-color: #3b82f6 !important; color: white !important; }
 
         .horario-badge { display: flex; align-items: center; gap: 6px; background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; margin-bottom: 5px; border: 1px solid #e2e8f0; width: fit-content; }
         .horario-badge svg { color: #3b82f6; }
+        
+        .btn-grade { background:white; color:#3b82f6; border:1px solid #bfdbfe; padding:6px 12px; border-radius:8px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; transition:0.2s; font-size:0.85rem; }
+        .btn-grade:hover { background:#eff6ff; border-color:#3b82f6; }
+        #btn-imprimir-grade:hover { background:#f1f5f9; color:#1e293b; border-color:#94a3b8; }
+
+        @media print {
+            body > :not(#modal-grade) { display: none !important; }
+            #modal-grade {
+                display: flex !important;
+                position: static !important;
+                background: white !important;
+                height: 100vh !important;
+                width: 100vw !important;
+                z-index: 999999 !important;
+                box-shadow: none !important;
+                backdrop-filter: none !important;
+            }
+            #modal-grade > div {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
+            #modal-grade > div > div:last-child {
+                overflow: visible !important;
+                height: auto !important;
+            }
+            #btn-fechar-modal, #btn-imprimir-grade { display: none !important; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
     `);
 
+    // se tiver no painel, desenha sidebar e cards
     if (isDashboard) {
         GM_addStyle(`
             #container, #cabecalho, #rodape, #barra-governo { display: none !important; }
@@ -191,6 +346,7 @@
             .menu-toggle { z-index: 1000; position: relative; background: white; border: 1px solid #e2e8f0; cursor: pointer; color: #334155; width: 40px; height: 40px; border-radius: 8px; transition: 0.2s; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         `);
         
+        // monta a estrutura HTML da sidebar e conteudo
         const dashHTML=`
         <aside class="sidebar">
             <div class="sidebar-header">${icons.student} <div class="logo-text">SIGAA <span>Ultimate</span></div></div>
@@ -238,7 +394,11 @@
                         </div>
                     </div>
 
-                    <h2 style="font-size:1.5rem; font-weight:700; color:#1e293b; margin-bottom:30px; display:flex; align-items:center; gap:12px;">${icons.class} Turmas do Semestre</h2>
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:30px;">
+                        <h2 style="font-size:1.5rem; font-weight:700; color:#1e293b; margin:0; display:flex; align-items:center; gap:12px;">${icons.class} Turmas do Semestre</h2>
+                        <button class="btn-grade" id="btn-ver-grade">${icons.table} Ver Grade</button>
+                    </div>
+                    
                     <div id="dash-cards" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:25px;"></div>
                 </div>
             </div>
@@ -246,13 +406,18 @@
         
         const div = document.createElement('div'); div.innerHTML = dashHTML; document.body.appendChild(div);
         
+        // eventos de clique do perfil e grade
         const userBtn = document.getElementById('userAreaBtn');
         const userDrop = document.getElementById('userDropdown');
         if(userBtn) { userBtn.addEventListener('click', () => { userDrop.classList.toggle('open'); }); }
 
         document.getElementById('btn-meus-dados')?.addEventListener('click', (e) => { e.preventDefault(); triggerMeusDados(); });
         document.getElementById('btn-editar-perfil')?.addEventListener('click', (e) => { e.preventDefault(); triggerEditarPerfil(); });
+        document.getElementById('btn-ver-grade')?.addEventListener('click', () => { 
+            document.getElementById('modal-grade').style.display = 'flex'; 
+        });
 
+        // cria os cards das materias
         const cardArea = document.getElementById('dash-cards');
         const colors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b', '#ef4444'];
         
@@ -269,8 +434,19 @@
                     const uid = "dash-" + i; link.id = uid;
                     const nome = link.innerText.trim();
                     const local = cols[2].innerText.replace("Acessar:", "").trim();
-                    const horarioHTML = formatHorarios(cols[3].innerText);
+                    const horarioStr = cols[3].innerText;
+                    const horarioHTML = formatHorarios(horarioStr);
                     const bg = colors[i % colors.length];
+                    
+                    let nomeMateria = nome;
+                    if (nome.includes(' - ')) {
+                        const parts = nome.split(' - ');
+                        nomeMateria = parts.slice(1).join(' - ').trim();
+                    }
+                    
+                    // joga dados pra grade
+                    parseToGrid(horarioStr, nomeMateria, bg);
+
                     const card = document.createElement('div');
                     card.style.cssText = `background:white; border-radius:16px; padding:25px; border:1px solid #e2e8f0; cursor:pointer; position:relative; overflow:hidden; box-shadow:0 10px 15px -3px rgba(0,0,0,0.03); transition:0.3s;`;
                     card.innerHTML = `<div style="position:absolute; top:0; left:0; right:0; height:4px; background:${bg}"></div><h3 style="margin:5px 0 15px 0; color:#1e293b; font-weight:700; font-size:1rem; line-height:1.4; min-height:2.8em;">${nome}</h3><div style="color:#64748b; font-size:0.85rem; display:flex; gap:8px; align-items:center; margin-bottom:15px;">${icons.map} ${local}</div><div style="display:flex; flex-wrap:wrap; gap:5px;">${horarioHTML}</div>`;
@@ -281,8 +457,13 @@
                 }
             });
             if (!hasTurma) cardArea.innerHTML = "<p>Nenhuma turma encontrada.</p>";
+            
+            // depois de ler tudo, cria a grade visual
+            criarModalGrade();
+
         } catch(e) {}
 
+        // gambiarra pra arrumar o menu dropdown nativo que buga
         const initMenu = setInterval(() => {
             const menu = document.getElementById('menu-dropdown');
             if (menu) { 
@@ -291,6 +472,7 @@
             }
         }, 200); 
 
+        // logica do botao de menu (toggle)
         const menuBtn = document.getElementById('dashMenuBtn');
         if (menuBtn) {
             menuBtn.addEventListener('click', (e) => {
@@ -321,6 +503,7 @@
             });
         }
     } else {
+        // se tiver em pagina interna (notas, frequencia...), injeta o menu flutuante
         GM_addStyle(`
             #internal-navbar { position: fixed; top: 0; left: 0; right: 0; height: 55px; background-color: #0f172a; color: white; z-index: 9999; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; } 
             .nav-link { background: rgba(255,255,255,0.1); color: white; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; cursor: pointer; border: none; font-family: 'Inter', sans-serif !important; } 
