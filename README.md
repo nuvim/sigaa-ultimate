@@ -1,44 +1,49 @@
 # SIGAA Ultimate
 
-**Uma nova interface para o SIGAA da UFC.** Este projeto é um conjunto de *Userscripts* que modernizam o visual e a usabilidade do sistema acadêmico, tornando a experiência mais limpa, rápida e agradável.
+**Uma nova experiência para o SIGAA da UFC.**
 
-> ⚠️ **Nota:** Projeto independente e open-source.
+O **SIGAA Ultimate** é um projeto independente e open-source que moderniza a interface do sistema acadêmico através de *Userscripts*. Meu objetivo é tornar a navegação mais limpa, rápida, agradável e visualmente consistente, corrigindo falhas de usabilidade do sistema original.
 
-## 📦 Instalação e Downloads
+## 📦 Downloads e Versões
 
-Para garantir que você esteja sempre utilizando a versão mais estável e segura, os downloads agora estão centralizados na página de **Releases** do GitHub.
-
-### 🛠️ Pré-requisitos e Configuração
-
-Para que o **SIGAA Ultimate** funcione sem interrupções, siga estes passos antes de instalar os scripts:
-
-1.  **Instale o Gerenciador:** Tenha a extensão **Tampermonkey** instalada (Chrome, Edge, Firefox, Opera).
-2.  **Ative o Modo do Desenvolvedor (Importante):**
-    * Em navegadores como **Chrome** ou **Edge**, vá em *Gerenciar Extensões* (`chrome://extensions`).
-    * No canto superior direito, ative a chave **"Modo do desenvolvedor"** (Developer mode).
-    * *Isso impede que o navegador bloqueie o script por considerá-lo uma "fonte externa".*
-3.  **Conceda Permissões:**
-    * Ao instalar ou executar o script pela primeira vez, o Tampermonkey pode solicitar permissão para acessar/modificar dados em `si3.ufc.br`.
-    * Clique em **"Permitir sempre"** (Allow always). Sem isso, o novo visual não será aplicado.
-
-### Como Baixar
-1. Clique no link abaixo para acessar a página de versões.
-2. Escolha a versão desejada.
-3. Na seção "Assets", clique nos arquivos `.user.js` que deseja instalar.
+Para garantir estabilidade e segurança, **todos os downloads estão centralizados na página de Releases**. Lá você encontra os arquivos da versão estável mais recente e o detalhamento do que há de novo.
 
 [👉 **ACESSAR PÁGINA DE DOWNLOADS (RELEASES)**](../../releases)
 
 ---
 
-## ✨ Módulos do Pacote
+## 🛠️ Guia de Instalação
 
-Ao acessar a página de releases, você encontrará os seguintes módulos:
+Para que o **SIGAA Ultimate** funcione corretamente no seu navegador, siga os passos abaixo:
 
-* **🔐 Login Ultimate:** Uma tela de login totalmente redesenhada, com suporte a temas (Claro/Escuro), inputs inteligentes e links de acesso rápido.
-* **🏠 Landing Clean:** Página inicial pública modernizada, sem menus quebrados e com navegação fluida.
-* **🎓 Portal do Discente:** O painel principal transformado. Inclui Sidebar lateral, Grade Curricular visual, Cards de turmas e modo escuro nativo.
+### 1. Pré-requisitos
+Antes de instalar os scripts, você precisa de um gerenciador de userscripts.
+* Instale a extensão **Tampermonkey** (Disponível para Chrome, Edge, Firefox, Opera e Safari).
+
+### 2. Configuração Importante (Modo Desenvolvedor)
+Se você usa **Chrome** ou **Edge**, é necessário ativar o modo desenvolvedor para permitir a execução correta dos scripts locais/externos:
+1.  Vá em *Gerenciar Extensões* (`chrome://extensions` ou `edge://extensions`).
+2.  No canto superior direito (ou esquerdo, dependendo da versão), ative a chave **"Modo do desenvolvedor"**.
+3.  *Isso impede que o navegador bloqueie o script por considerá-lo uma fonte desconhecida.*
+
+### 3. Instalando os Módulos
+1.  Acesse a aba **[Releases](../../releases)** deste repositório.
+2.  Escolha a versão mais recente.
+3.  Clique nos links para abrir os `.user.js` desejados (ex: `sigaa-login.user.js`, `sigaa-portal.user.js`).
+4.  O Tampermonkey abrirá uma janela de instalação. Clique em **Instalar**, recomendo desinstalar os scripts de versões antigas.
+5.  Ao acessar o SIGAA pela primeira vez, clique em **"Permitir sempre"** caso o Tampermonkey solicite permissão.
 
 ---
 
-### 📝 Histórico de Versões
-Para ver capturas de tela (screenshots), detalhes técnicos das mudanças e o histórico completo, consulte a aba **[Releases](../../releases)**.
+## ✨ O que o projeto altera?
+
+O SIGAA Ultimate é modular. Você pode instalar apenas o que deseja, embora a experiência completa seja recomendada:
+
+* **🔐 Login:** Redesign completo da tela de entrada, focado em estética moderna.
+* **🏠 Landing Page:** Limpeza visual da página inicial pública.
+* **🎓 Portal do Discente:** Modernização do painel interno, melhorando a legibilidade e a organização dos elementos.
+
+---
+
+### 📝 Histórico e Changelog
+Para ver capturas de tela, detalhes técnicos e o histórico de mudanças de cada versão, consulte sempre a aba **[Releases](../../releases)**.

@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         SIGAA Ultimate 3.1 - Portal Híbrido
+// @name         SIGAA Ultimate 2.0 - Portal Híbrido
 // @namespace    http://tampermonkey.net/
-// @version      3.1-stable
+// @version      2.0
 // @description  Dashboard Premium + Interno Seguro com Ferramentas.
 // @author       Gusttavo
 // @match        *://si3.ufc.br/sigaa/*
@@ -25,32 +25,32 @@
 
     const isDashboard = document.querySelector("#agenda-docente") !== null;
     const isInternalPage = !isDashboard && (document.querySelector("#cabecalho") !== null || document.querySelector(".ui-layout-west") !== null);
-    
+
     if (document.getElementById('painel-erro') || document.body.innerText.includes("Comportamento Inesperado")) {
         localStorage.removeItem('sigaa_plus_cache');
         return;
     }
-    
+
     if (!isDashboard && !isInternalPage) return;
 
     // 2. PALETAS (Estilo Premium)
     const PALETTES = {
-        ufc: { 
+        ufc: {
             name: "UFC (Original)", primary: '#3b82f6', hover: '#2563eb',
             light: { bg: '#f8fafc', card: '#ffffff', sidebar: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)', text: '#1e293b', subtext: '#64748b', border: '#e2e8f0', welcome: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)' },
             dark: { bg: '#0f172a', card: '#1e293b', sidebar: '#020617', text: '#f1f5f9', subtext: '#94a3b8', border: '#334155', welcome: 'linear-gradient(135deg, #172554 0%, #1e293b 100%)' }
         },
-        rocket: { 
+        rocket: {
             name: "Rocketseat", primary: '#8257e6', hover: '#996DFF',
             light: { bg: '#f4f4fa', card: '#ffffff', sidebar: '#121214', text: '#202024', subtext: '#4d4d57', border: '#e1e1e6', welcome: 'linear-gradient(135deg, #8257e6 0%, #202024 100%)' },
             dark: { bg: '#121214', card: '#202024', sidebar: '#09090a', text: '#e1e1e6', subtext: '#a8a8b3', border: '#29292e', welcome: 'linear-gradient(135deg, #4c1d95 0%, #121214 100%)' }
         },
-        matrix: { 
+        matrix: {
             name: "Matrix", primary: '#00e639', hover: '#00ff41',
             light: { bg: '#f0fdf4', card: '#ffffff', sidebar: '#000000', text: '#064e3b', subtext: '#065f46', border: '#bbf7d0', welcome: 'linear-gradient(135deg, #052e16 0%, #166534 100%)' },
             dark: { bg: '#000000', card: '#0a120a', sidebar: '#001a00', text: '#00ff41', subtext: '#008F11', border: '#003300', welcome: 'linear-gradient(135deg, #002600 0%, #004d00 100%)' }
         },
-        orange: { 
+        orange: {
             name: "Laranja", primary: '#f97316', hover: '#ea580c',
             light: { bg: '#fff7ed', card: '#ffffff', sidebar: '#271a12', text: '#431407', subtext: '#7c2d12', border: '#fed7aa', welcome: 'linear-gradient(135deg, #9a3412 0%, #f97316 100%)' },
             dark: { bg: '#1c1917', card: '#292524', sidebar: '#0c0a09', text: '#fafaf9', subtext: '#a8a29e', border: '#44403c', welcome: 'linear-gradient(135deg, #431407 0%, #292524 100%)' }
@@ -70,7 +70,7 @@
         root.style.setProperty('--theme-primary-light', `${themeBase.primary}25`);
         root.style.setProperty('--bg-color', mode.bg);
         root.style.setProperty('--card-bg', mode.card);
-        
+
         if (mode.sidebar.includes('gradient')) {
             root.style.setProperty('--sidebar-bg-image', mode.sidebar);
             root.style.setProperty('--sidebar-bg-color', 'transparent');
@@ -130,42 +130,42 @@
 
     // 3. LÓGICA DO DASHBOARD
     if (isDashboard) {
-        
+
         GM_addStyle(`
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-            
+
             /* RESET */
             body { font-family: 'Inter', sans-serif !important; background-color: var(--bg-color) !important; color: var(--text-primary) !important; margin: 0; overflow: hidden; }
             #container, #cabecalho, #rodape, #barra-governo, body > table { display: none !important; }
 
             /* SIDEBAR (Visual do Repositório) */
-            .sidebar { 
-                position: fixed; top: 0; left: 0; bottom: 0; width: 280px; 
+            .sidebar {
+                position: fixed; top: 0; left: 0; bottom: 0; width: 280px;
                 background: var(--sidebar-bg); background-image: var(--sidebar-bg-image); background-color: var(--sidebar-bg-color);
-                border-right: 1px solid var(--border-color); z-index: 100; 
-                display: flex; flex-direction: column; box-shadow: 4px 0 25px rgba(0,0,0,0.15); 
-                overflow-y: auto; color: #f8fafc; text-align: left; 
+                border-right: 1px solid var(--border-color); z-index: 100;
+                display: flex; flex-direction: column; box-shadow: 4px 0 25px rgba(0,0,0,0.15);
+                overflow-y: auto; color: #f8fafc; text-align: left;
             }
             .sidebar-header { min-height: 80px; display: flex; align-items: center; padding: 0 24px; border-bottom: 1px solid rgba(255,255,255,0.05); }
             .logo-text { font-size: 1.2rem; font-weight: 800; margin-left: 10px; color: #f8fafc; letter-spacing: -0.5px; }
             .logo-text span { color: var(--theme-primary); font-weight: 400; }
-            
+
             .profile-section { padding: 30px 20px 20px; display: flex; flex-direction: column; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; }
             .avatar-ring { padding: 4px; border: 3px solid var(--sidebar-border); border-radius: 50%; margin-bottom: 12px; transition: 0.3s; cursor: pointer; display: inline-block; }
             .avatar-ring:hover { border-color: var(--theme-primary); box-shadow: 0 0 20px var(--theme-primary-light); }
             .avatar-container { width: 85px; height: 85px; border-radius: 50%; overflow: hidden; background: #1e293b; }
             .avatar-container img { width: 100%; height: 100%; object-fit: cover; }
             .user-name { font-weight: 700; font-size: 1.1rem; color: #f1f5f9; margin-bottom: 20px; text-align: center; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-            
+
             .nav-menu { flex: 1; padding: 15px 0; }
             .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: #cbd5e1; font-size: 0.95rem; text-decoration: none; transition: 0.2s; cursor: pointer; font-weight: 500; border-left: 4px solid transparent; }
             .menu-item:hover { background: rgba(255,255,255,0.05); color: white; padding-left: 28px; }
             .menu-item.active { background: linear-gradient(90deg, var(--theme-primary-light) 0%, transparent 100%); border-left-color: var(--theme-primary); color: var(--theme-primary); font-weight: 600; }
-            
+
             .btn-biblioteca { background: var(--theme-primary-light); border: 1px solid var(--theme-primary-light); margin: 10px 15px; border-radius: 10px; color: #f8fafc !important; }
             .btn-biblioteca:hover { background: rgba(255,255,255,0.1); border-color: var(--theme-primary); transform: translateY(-1px); }
             .btn-biblioteca svg { color: var(--theme-primary) !important; }
-            
+
             #btn-config { color: #cbd5e1 !important; padding: 15px 24px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 0.9rem; transition: 0.2s; }
             #btn-config:hover { color: var(--theme-primary) !important; }
             #btn-sair { color: #f87171 !important; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding: 20px 24px; }
@@ -173,12 +173,12 @@
             /* MAIN CONTENT */
             .main-content { margin-left: 280px; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
             .topbar { height: 80px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: sticky; top: 0; z-index: 50; }
-            
-            .welcome-card { 
+
+            .welcome-card {
                 background: var(--welcome-bg);
-                color: white; border-radius: 20px; padding: 35px; margin-bottom: 40px; 
-                display: flex; justify-content: space-between; align-items: center; 
-                box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2); position: relative; overflow: hidden; 
+                color: white; border-radius: 20px; padding: 35px; margin-bottom: 40px;
+                display: flex; justify-content: space-between; align-items: center;
+                box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2); position: relative; overflow: hidden;
             }
             .welcome-card::after { content: ''; position: absolute; right: -20px; top: -50px; width: 300px; height: 300px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
             .welcome-text h1 { margin: 0 0 10px; font-size: 2rem; font-weight: 800; letter-spacing: -1px; }
@@ -187,7 +187,7 @@
 
             .btn-grade { background:var(--card-bg); color:var(--theme-primary); border:1px solid var(--theme-primary); padding:6px 12px; border-radius:8px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; transition:0.2s; font-size:0.85rem; }
             .btn-grade:hover { background:var(--theme-primary-light); }
-            
+
             .horario-badge { display: flex; align-items: center; gap: 6px; background: var(--bg-color); color: var(--text-secondary); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; margin-bottom: 5px; border: 1px solid var(--border-color); width: fit-content; }
             .horario-badge svg { color: var(--theme-primary); }
 
@@ -206,13 +206,37 @@
             .sub-item:hover { background: rgba(255,255,255,0.05); color: var(--theme-primary); }
 
             /* Fixes do menu original flutuante */
-            #menu-dropdown { background: var(--sidebar-bg) !important; border: 1px solid var(--sidebar-border) !important; background-image: var(--sidebar-bg-image) !important; background-color: var(--sidebar-bg-color) !important; }
-            #menu-dropdown * { background: transparent !important; color: #cbd5e1 !important; border-color: var(--sidebar-border) !important; }
-            #menu-dropdown .ThemeOfficeMenuItemHover, #menu-dropdown .ThemeOfficeMenuItemHover * { background-color: var(--theme-primary) !important; color: white !important; }
+            #menu-dropdown {
+                background-image: var(--sidebar-bg-image) !important;
+                background-color: var(--sidebar-bg-color) !important;
+                border: 1px solid var(--sidebar-border) !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important; /* Sombra para destacar do fundo */
+            }
 
+            /* Reset geral: deixa texto e células transparentes para herdar do pai */
+            #menu-dropdown * {
+                background: transparent !important;
+                color: #cbd5e1 !important;
+                border-color: var(--sidebar-border) !important;
+            }
+
+            /* CORREÇÃO CRÍTICA: Reaplica o fundo especificamente nos containers dos submenus */
+            #menu-dropdown table,
+            #menu-dropdown .ThemeOfficeMenu,
+            #menu-dropdown div[id^="cmSubMenuID"] {
+                background-image: var(--sidebar-bg-image) !important;
+                background-color: var(--sidebar-bg-color) !important;
+            }
+
+            /* Estilo do Hover (Item selecionado) */
+            #menu-dropdown .ThemeOfficeMenuItemHover,
+            #menu-dropdown .ThemeOfficeMenuItemHover * {
+                background-color: var(--theme-primary) !important;
+                color: white !important;
+            }
             /* Fix para Titulo H2 Feio */
             h2 { background: transparent !important; border: none !important; box-shadow: none !important; }
-            
+
             /* Modal Switch */
             .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
             .switch input { opacity: 0; width: 0; height: 0; }
@@ -220,14 +244,14 @@
             .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
             input:checked + .slider { background-color: var(--theme-primary); }
             input:checked + .slider:before { transform: translateX(20px); }
-            
+
             /* FIX PDF COLORIDO */
             @media print {
                 * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                body > :not(#modal-grade) { display: none !important; } 
-                #modal-grade { display: flex !important; position: static !important; background: white !important; height: 100vh !important; width: 100vw !important; z-index: 999999 !important; box-shadow: none !important; backdrop-filter: none !important; } 
-                #modal-grade > div { width: 100% !important; max-width: 100% !important; height: auto !important; box-shadow: none !important; border-radius: 0 !important; } 
-                #modal-grade > div > div:last-child { overflow: visible !important; height: auto !important; } 
+                body > :not(#modal-grade) { display: none !important; }
+                #modal-grade { display: flex !important; position: static !important; background: white !important; height: 100vh !important; width: 100vw !important; z-index: 999999 !important; box-shadow: none !important; backdrop-filter: none !important; }
+                #modal-grade > div { width: 100% !important; max-width: 100% !important; height: auto !important; box-shadow: none !important; border-radius: 0 !important; }
+                #modal-grade > div > div:last-child { overflow: visible !important; height: auto !important; }
                 #btn-fechar-modal, #btn-imprimir-grade { display: none !important; }
             }
         `);
@@ -248,7 +272,7 @@
             const elNome = document.querySelector(".nome_usuario p") || document.querySelector(".nome small b");
             const elFoto = document.querySelector(".foto img");
             const elSemestre = document.querySelector(".periodo .negrito");
-            
+
             aluno.nome = elNome ? capitalizeName(elNome.innerText.trim()) : (aluno.nome || "Discente");
             aluno.avatar = elFoto ? elFoto.src : aluno.avatar;
             aluno.semestre = elSemestre ? elSemestre.innerText.trim() : aluno.semestre;
@@ -283,7 +307,7 @@
             <div id="btn-config">${icons.gear} Aparência</div>
             <a href="/sigaa/logar.do?dispatch=logOff" class="menu-item" id="btn-sair">${icons.logout} Sair</a>
         </aside>
-        
+
         <div class="main-content">
             <header class="topbar">
                 <button class="menu-toggle" id="dashMenuBtn">${icons.menu}</button>
@@ -308,13 +332,13 @@
                 </div>
             </div>
         </div>`;
-        
+
         const div = document.createElement('div'); div.innerHTML = dashHTML; document.body.appendChild(div);
 
         // --- GERAÇÃO DE CARDS ---
         const cardArea = document.getElementById('dash-cards');
         const colors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b', '#ef4444'];
-        
+
         function parseToGrid(horarioStr, nomeMateria, cor) {
             const text = cleanText(horarioStr);
             const regex = /(SEG|TER|QUA|QUI|SEX|SAB|DOM)[\s\.]*(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/gi;
@@ -349,7 +373,7 @@
                     const horarioHTML = formatHorarios(horarioStr);
                     const bg = colors[i % colors.length];
                     let nomeMateria = nome.includes(' - ') ? nome.split(' - ').slice(1).join(' - ').trim() : nome;
-                    
+
                     parseToGrid(horarioStr, nomeMateria, bg);
 
                     const card = document.createElement('div');
@@ -401,27 +425,27 @@
 
     // --- 4. LOGICA DE PÁGINAS INTERNAS (SOMENTE NAVBAR FIXA) ---
     } else {
-        
+
         GM_addStyle(`
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-            
+
             /* Navbar Fixa no Topo */
-            #internal-navbar { 
-                position: fixed; top: 0; left: 0; right: 0; height: 50px; 
-                background-color: #0f172a; border-bottom: 1px solid #334155; 
-                color: white; z-index: 999999; display: flex; align-items: center; 
-                justify-content: space-between; padding: 0 20px; font-family: 'Inter', sans-serif !important; 
-            } 
-            .nav-link { 
-                background: rgba(255,255,255,0.1); color: white; text-decoration: none; 
-                padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; display: flex; 
+            #internal-navbar {
+                position: fixed; top: 0; left: 0; right: 0; height: 50px;
+                background-color: #0f172a; border-bottom: 1px solid #334155;
+                color: white; z-index: 999999; display: flex; align-items: center;
+                justify-content: space-between; padding: 0 20px; font-family: 'Inter', sans-serif !important;
+            }
+            .nav-link {
+                background: rgba(255,255,255,0.1); color: white; text-decoration: none;
+                padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; display: flex;
                 align-items: center; gap: 6px; cursor: pointer; border: none; font-family: 'Inter', sans-serif !important; transition: 0.2s;
             }
             .nav-link:hover { background: rgba(255,255,255,0.2); }
-            
+
             /* Empurra o site original para baixo */
             body { padding-top: 50px !important; }
-            
+
             /* Oculta Barra Azul Antiga */
             #painel-usuario { display: none !important; }
         `);
@@ -440,28 +464,28 @@
         function checkFrequency() {
             const bodyText = document.body.innerText;
             const faultsMatch = bodyText.match(/Total de Faltas:?\s*(\d+)/i);
-            
-            if (!faultsMatch) { 
-                alert("⚠️ Página não reconhecida.\n\nPor favor, navegue até: Menu > Aluno > Frequência e clique novamente."); 
-                return; 
+
+            if (!faultsMatch) {
+                alert("⚠️ Página não reconhecida.\n\nPor favor, navegue até: Menu > Aluno > Frequência e clique novamente.");
+                return;
             }
 
             let totalFaltas = parseInt(faultsMatch[1]);
-            let maxFaltas = 16; 
+            let maxFaltas = 16;
             const maxMatch = bodyText.match(/M.ximo de Faltas Permitido:?\s*(\d+)/i);
-            if (maxMatch) { maxFaltas = parseInt(maxMatch[1]); } 
-            else { 
-                const headers = document.querySelectorAll('div.titulo, h4'); 
-                for(let h of headers) { 
-                    const match = h.innerText.match(/\(\s*(\d+)\s*h\s*\)/i); 
-                    if (match) { maxFaltas = Math.floor(parseInt(match[1]) * 0.25); break; } 
-                } 
+            if (maxMatch) { maxFaltas = parseInt(maxMatch[1]); }
+            else {
+                const headers = document.querySelectorAll('div.titulo, h4');
+                for(let h of headers) {
+                    const match = h.innerText.match(/\(\s*(\d+)\s*h\s*\)/i);
+                    if (match) { maxFaltas = Math.floor(parseInt(match[1]) * 0.25); break; }
+                }
             }
             const restantes = maxFaltas - totalFaltas;
-            let statusText = "Seguro", statusColor = "#22c55e"; 
+            let statusText = "Seguro", statusColor = "#22c55e";
             if (totalFaltas >= (maxFaltas * 0.8)) { statusText = "Cuidado"; statusColor = "#f97316"; }
             if (totalFaltas > maxFaltas) { statusText = "Reprovado"; statusColor = "#ef4444"; }
-            
+
             const exist = document.getElementById('modal-freq'); if(exist) exist.remove();
             const modal = document.createElement('div'); modal.id = 'modal-freq';
             modal.style.cssText = `display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999999; align-items:center; justify-content:center; backdrop-filter:blur(3px); font-family: 'Inter', sans-serif;`;
