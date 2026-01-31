@@ -24,16 +24,24 @@
     if (window.self !== window.top) return;
 
     const isDashboard = document.querySelector("#agenda-docente") !== null;
-    const isInternalPage = !isDashboard && (document.querySelector("#cabecalho") !== null || document.querySelector(".ui-layout-west") !== null);
-
+    
+    // CORREÇÃO: Agora detecta páginas de relatório/notas como "Página Interna"
+    const isInternalPage = !isDashboard && (
+        document.querySelector("#cabecalho") !== null || 
+        document.querySelector(".ui-layout-west") !== null || 
+        document.querySelector("#relatorio") !== null ||        
+        document.querySelector(".tabelaRelatorio") !== null ||  
+        window.location.href.includes("/ava/")                  
+    );
+    
     if (document.getElementById('painel-erro') || document.body.innerText.includes("Comportamento Inesperado")) {
         localStorage.removeItem('sigaa_plus_cache');
         return;
     }
-
+    
     if (!isDashboard && !isInternalPage) return;
 
-    // 2. PALETAS (Estilo Premium)
+    // 2. PALETAS
     const PALETTES = {
         ufc: {
             name: "UFC (Original)", primary: '#3b82f6', hover: '#2563eb',
@@ -424,30 +432,32 @@
         }
 
     // --- 4. LOGICA DE PÁGINAS INTERNAS (SOMENTE NAVBAR FIXA) ---
+    // --- 4. LOGICA DE PÁGINAS INTERNAS (Barra Fixa + Ferramentas) ---
     } else {
-
+        
         GM_addStyle(`
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
-            /* Navbar Fixa no Topo */
-            #internal-navbar {
-                position: fixed; top: 0; left: 0; right: 0; height: 50px;
-                background-color: #0f172a; border-bottom: 1px solid #334155;
-                color: white; z-index: 999999; display: flex; align-items: center;
-                justify-content: space-between; padding: 0 20px; font-family: 'Inter', sans-serif !important;
-            }
-            .nav-link {
-                background: rgba(255,255,255,0.1); color: white; text-decoration: none;
-                padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; display: flex;
+            
+            #internal-navbar { 
+                position: fixed; top: 0; left: 0; right: 0; height: 50px; 
+                background-color: #0f172a; border-bottom: 1px solid #334155; 
+                color: white; z-index: 999999; display: flex; align-items: center; 
+                justify-content: space-between; padding: 0 20px; font-family: 'Inter', sans-serif !important; 
+            } 
+            .nav-link { 
+                background: rgba(255,255,255,0.1); color: white; text-decoration: none; 
+                padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; display: flex; 
                 align-items: center; gap: 6px; cursor: pointer; border: none; font-family: 'Inter', sans-serif !important; transition: 0.2s;
             }
             .nav-link:hover { background: rgba(255,255,255,0.2); }
-
-            /* Empurra o site original para baixo */
             body { padding-top: 50px !important; }
-
-            /* Oculta Barra Azul Antiga */
             #painel-usuario { display: none !important; }
+            
+            /* Estilo para as Células de Nota no Modal */
+            .calc-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
+            .calc-label { font-size: 0.85rem; color: #94a3b8; }
+            .calc-val { font-weight: 700; font-size: 1rem; color: #f8fafc; }
+            .calc-res { font-weight: 800; font-size: 1.1rem; color: var(--theme-primary); }
         `);
 
         // HTML NAVBAR
@@ -455,58 +465,167 @@
         nav.innerHTML = `
             <div style="display:flex; align-items:center; gap:12px; font-weight:700;"><span>SIGAA Ultimate</span></div>
             <div style="display:flex; gap:10px;">
-                <button class="nav-link" id="btn-calc-freq">${icons.class} Frequência</button>
+                <button class="nav-link" id="btn-calc-freq">${icons.clock} Frequência</button>
+                <button class="nav-link" id="btn-calc-notas">${icons.class} Notas</button>
                 <a href="/sigaa/verPortalDiscente.do" class="nav-link">${icons.home} Home</a>
             </div>`;
         document.body.prepend(nav);
 
-        // FUNÇÃO DE FREQUÊNCIA
+        // --- A. CALCULADORA DE FREQUÊNCIA ---
         function checkFrequency() {
             const bodyText = document.body.innerText;
             const faultsMatch = bodyText.match(/Total de Faltas:?\s*(\d+)/i);
-
-            if (!faultsMatch) {
-                alert("⚠️ Página não reconhecida.\n\nPor favor, navegue até: Menu > Aluno > Frequência e clique novamente.");
-                return;
+            
+            if (!faultsMatch) { 
+                alert("⚠️ Página não reconhecida ou sem dados de frequência.\n\nNavegue até a página de Frequência da disciplina."); 
+                return; 
             }
 
             let totalFaltas = parseInt(faultsMatch[1]);
-            let maxFaltas = 16;
+            let maxFaltas = 16; 
             const maxMatch = bodyText.match(/M.ximo de Faltas Permitido:?\s*(\d+)/i);
-            if (maxMatch) { maxFaltas = parseInt(maxMatch[1]); }
-            else {
-                const headers = document.querySelectorAll('div.titulo, h4');
-                for(let h of headers) {
-                    const match = h.innerText.match(/\(\s*(\d+)\s*h\s*\)/i);
-                    if (match) { maxFaltas = Math.floor(parseInt(match[1]) * 0.25); break; }
-                }
+            if (maxMatch) { maxFaltas = parseInt(maxMatch[1]); } 
+            else { 
+                // Tenta estimar pela carga horaria se não achar explícito
+                const headers = document.querySelectorAll('div.titulo, h4'); 
+                for(let h of headers) { 
+                    const match = h.innerText.match(/\(\s*(\d+)\s*h\s*\)/i); 
+                    if (match) { maxFaltas = Math.floor(parseInt(match[1]) * 0.25); break; } 
+                } 
             }
             const restantes = maxFaltas - totalFaltas;
-            let statusText = "Seguro", statusColor = "#22c55e";
+            let statusText = "Seguro", statusColor = "#22c55e"; 
             if (totalFaltas >= (maxFaltas * 0.8)) { statusText = "Cuidado"; statusColor = "#f97316"; }
-            if (totalFaltas > maxFaltas) { statusText = "Reprovado"; statusColor = "#ef4444"; }
-
-            const exist = document.getElementById('modal-freq'); if(exist) exist.remove();
-            const modal = document.createElement('div'); modal.id = 'modal-freq';
-            modal.style.cssText = `display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999999; align-items:center; justify-content:center; backdrop-filter:blur(3px); font-family: 'Inter', sans-serif;`;
-            modal.innerHTML = `
-                <div style="background:#1e293b; color:white; width:400px; border-radius:16px; padding:30px; box-shadow:0 20px 50px rgba(0,0,0,0.3); text-align:center; border:1px solid #334155;">
-                    <h2 style="margin:0 0 20px 0; color:white !important; font-size:1.3rem; font-weight:700; background:transparent !important; border:none !important;">Monitor de Frequência</h2>
-                    <div style="display:flex; justify-content:space-around; margin-bottom:20px;">
-                        <div><div style="font-size:0.8rem; color:#94a3b8; font-weight:700;">FALTAS</div><div style="font-size:2rem; font-weight:800; color:white;">${totalFaltas}</div></div>
-                        <div><div style="font-size:0.8rem; color:#94a3b8; font-weight:700;">LIMITE</div><div style="font-size:2rem; font-weight:800; color:white;">${maxFaltas}</div></div>
-                    </div>
-                    <div style="background:${statusColor}20; color:${statusColor}; padding:10px; border-radius:8px; font-weight:700; margin-bottom:20px; border:1px solid ${statusColor};">
-                        ${statusText}: Restam ${restantes} faltas
-                    </div>
-                    <button id="btn-fechar-freq" style="background:#3b82f6; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:700;">Entendido</button>
-                </div>`;
-            document.body.appendChild(modal);
-            document.getElementById('btn-fechar-freq').onclick = () => modal.remove();
-            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+            if (totalFaltas > maxFaltas) { statusText = "Reprovado por Falta"; statusColor = "#ef4444"; }
+            
+            showModal("Monitor de Frequência", `
+                <div style="display:flex; justify-content:space-around; margin-bottom:20px;">
+                    <div><div style="font-size:0.8rem; color:#94a3b8; font-weight:700;">FALTAS</div><div style="font-size:2rem; font-weight:800; color:white;">${totalFaltas}</div></div>
+                    <div><div style="font-size:0.8rem; color:#94a3b8; font-weight:700;">LIMITE</div><div style="font-size:2rem; font-weight:800; color:white;">${maxFaltas}</div></div>
+                </div>
+                <div style="background:${statusColor}20; color:${statusColor}; padding:15px; border-radius:8px; font-weight:700; margin-bottom:10px; border:1px solid ${statusColor};">
+                    ${statusText}: Restam ${restantes} faltas
+                </div>
+            `);
         }
 
-        document.getElementById('btn-calc-freq').addEventListener('click', () => checkFrequency());
+        // --- B. CALCULADORA DE NOTAS ---
+        function checkGrades() {
+            // Tenta pegar matricula do cache, senao pede pro usuario (fallback)
+            let matricula = aluno.dados ? aluno.dados.matricula : null;
+            
+            // Procura tabela de notas
+            const table = document.querySelector('table.tabelaRelatorio');
+            if (!table) {
+                alert("⚠️ Tabela de notas não encontrada.\n\nEntre na disciplina e clique em 'Ver Notas' ou 'Participantes'.");
+                return;
+            }
+
+            let n1 = null, n2 = null, userFound = false;
+
+            // Varre as linhas procurando a matricula do usuario
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 2) {
+                    const matCell = cells[0].innerText.trim();
+                    // Se a matricula bater ou se só tiver 1 linha (visão de aluno unico)
+                    if ((matricula && matCell === matricula) || rows.length === 1) {
+                        userFound = true;
+                        // Padrão UFC: Coluna 2 = Nota 1, Coluna 3 = Nota 2
+                        // Limpa string (troca virgula por ponto, remove espaços)
+                        const clean = (txt) => parseFloat(txt.replace(',','.').trim());
+                        
+                        if (cells[2] && cells[2].innerText.match(/[\d,]/)) n1 = clean(cells[2].innerText);
+                        if (cells[3] && cells[3].innerText.match(/[\d,]/)) n2 = clean(cells[3].innerText);
+                    }
+                }
+            });
+
+            if (!userFound) {
+                alert("⚠️ Sua matrícula (" + (matricula || 'N/A') + ") não foi encontrada nesta tabela.");
+                return;
+            }
+
+            let htmlContent = "";
+            
+            if (n1 === null && n2 === null) {
+                htmlContent = "<p>Nenhuma nota lançada ainda.</p>";
+            } else if (n1 !== null && n2 === null) {
+                // SÓ TEM N1
+                const precisaPara7 = Math.max(0, 14 - n1).toFixed(1); // (N1+N2)/2 = 7 -> N2 = 14-N1
+                const precisaPara4 = Math.max(0, 8 - n1).toFixed(1);  // (N1+N2)/2 = 4 -> N2 = 8-N1
+                
+                htmlContent = `
+                    <div class="calc-row"><span class="calc-label">Nota Unidade 1</span> <span class="calc-val">${n1}</span></div>
+                    <hr style="border-color:rgba(255,255,255,0.1); margin:15px 0;">
+                    
+                    <div style="margin-bottom:15px;">
+                        <div class="calc-label">Para APROVAR DIRETO (Média 7):</div>
+                        <div style="color:#4ade80; font-size:1.2rem; font-weight:800;">Precisa de ${precisaPara7} na N2</div>
+                    </div>
+                    
+                    <div>
+                        <div class="calc-label">Para ir para FINAL (Mínimo):</div>
+                        <div style="color:#facc15; font-size:1.2rem; font-weight:800;">Precisa de ${precisaPara4} na N2</div>
+                        <small style="color:#94a3b8;">Menor que isso reprova direto.</small>
+                    </div>
+                `;
+            } else if (n1 !== null && n2 !== null) {
+                // TEM N1 E N2
+                const media = (n1 + n2) / 2;
+                let situacao = "", cor = "";
+                let extraInfo = "";
+
+                if (media >= 7) {
+                    situacao = "APROVADO POR MÉDIA"; cor = "#22c55e";
+                    extraInfo = "Parabéns! Você já passou.";
+                } else if (media < 4) {
+                    situacao = "REPROVADO"; cor = "#ef4444";
+                    extraInfo = "Média inferior a 4.0.";
+                } else {
+                    situacao = "AVALIAÇÃO FINAL"; cor = "#f97316";
+                    // Calculo da Final: (Media + AF) / 2 = 5  -> AF = 10 - Media
+                    const precisaAF = (10 - media).toFixed(1);
+                    extraInfo = `<div style="margin-top:10px; font-size:1.1rem;">Precisa tirar <span style="color:white; font-weight:800; font-size:1.4rem;">${precisaAF}</span> na Final.</div>`;
+                }
+
+                htmlContent = `
+                    <div class="calc-row"><span class="calc-label">Nota Unidade 1</span> <span class="calc-val">${n1}</span></div>
+                    <div class="calc-row"><span class="calc-label">Nota Unidade 2</span> <span class="calc-val">${n2}</span></div>
+                    <div class="calc-row" style="border:none; margin-top:15px;"><span class="calc-label">MÉDIA PARCIAL</span> <span class="calc-res" style="color:${cor}">${media.toFixed(1)}</span></div>
+                    
+                    <div style="background:${cor}20; border:1px solid ${cor}; color:${cor}; padding:15px; border-radius:8px; text-align:center; font-weight:700; margin-top:10px;">
+                        ${situacao}
+                        ${extraInfo}
+                    </div>
+                `;
+            }
+
+            showModal("Calculadora de Notas", htmlContent);
+        }
+
+        // --- HELPER PARA MODAL GENERICO ---
+        function showModal(title, content) {
+            const id = 'modal-generic-ultimate';
+            let modal = document.getElementById(id);
+            if(modal) modal.remove();
+            
+            modal = document.createElement('div');
+            modal.id = id;
+            modal.style.cssText = `display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999999; align-items:center; justify-content:center; backdrop-filter:blur(3px); font-family: 'Inter', sans-serif;`;
+            modal.innerHTML = `
+                <div style="background:#1e293b; color:white; width:90%; max-width:400px; border-radius:16px; padding:30px; box-shadow:0 20px 50px rgba(0,0,0,0.4); text-align:center; border:1px solid #334155; position:relative;">
+                    <button onclick="document.getElementById('${id}').remove()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:#64748b; font-size:1.5rem; cursor:pointer;">&times;</button>
+                    <h2 style="margin:0 0 20px 0; color:white !important; font-size:1.3rem; font-weight:700; background:transparent !important; border:none !important;">${title}</h2>
+                    ${content}
+                </div>`;
+            document.body.appendChild(modal);
+            modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+        }
+
+        document.getElementById('btn-calc-freq').addEventListener('click', checkFrequency);
+        document.getElementById('btn-calc-notas').addEventListener('click', checkGrades);
     }
 
     // --- FUNÇÃO COMPARTILHADA DE TEMAS ---
