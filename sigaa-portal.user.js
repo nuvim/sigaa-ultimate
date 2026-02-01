@@ -25,7 +25,7 @@
 
     const isDashboard = document.querySelector("#agenda-docente") !== null;
     
-    // CORREÇÃO: Agora detecta páginas de relatório/notas como "Página Interna"
+    // Detecção expandida para incluir páginas do AVA (Turma Virtual) como internas
     const isInternalPage = !isDashboard && (
         document.querySelector("#cabecalho") !== null || 
         document.querySelector(".ui-layout-west") !== null || 
@@ -41,24 +41,24 @@
     
     if (!isDashboard && !isInternalPage) return;
 
-    // 2. PALETAS
+    // 2. PALETAS (Estilo Premium)
     const PALETTES = {
-        ufc: {
+        ufc: { 
             name: "UFC (Original)", primary: '#3b82f6', hover: '#2563eb',
             light: { bg: '#f8fafc', card: '#ffffff', sidebar: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)', text: '#1e293b', subtext: '#64748b', border: '#e2e8f0', welcome: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)' },
             dark: { bg: '#0f172a', card: '#1e293b', sidebar: '#020617', text: '#f1f5f9', subtext: '#94a3b8', border: '#334155', welcome: 'linear-gradient(135deg, #172554 0%, #1e293b 100%)' }
         },
-        rocket: {
+        rocket: { 
             name: "Rocketseat", primary: '#8257e6', hover: '#996DFF',
             light: { bg: '#f4f4fa', card: '#ffffff', sidebar: '#121214', text: '#202024', subtext: '#4d4d57', border: '#e1e1e6', welcome: 'linear-gradient(135deg, #8257e6 0%, #202024 100%)' },
             dark: { bg: '#121214', card: '#202024', sidebar: '#09090a', text: '#e1e1e6', subtext: '#a8a8b3', border: '#29292e', welcome: 'linear-gradient(135deg, #4c1d95 0%, #121214 100%)' }
         },
-        matrix: {
+        matrix: { 
             name: "Matrix", primary: '#00e639', hover: '#00ff41',
             light: { bg: '#f0fdf4', card: '#ffffff', sidebar: '#000000', text: '#064e3b', subtext: '#065f46', border: '#bbf7d0', welcome: 'linear-gradient(135deg, #052e16 0%, #166534 100%)' },
             dark: { bg: '#000000', card: '#0a120a', sidebar: '#001a00', text: '#00ff41', subtext: '#008F11', border: '#003300', welcome: 'linear-gradient(135deg, #002600 0%, #004d00 100%)' }
         },
-        orange: {
+        orange: { 
             name: "Laranja", primary: '#f97316', hover: '#ea580c',
             light: { bg: '#fff7ed', card: '#ffffff', sidebar: '#271a12', text: '#431407', subtext: '#7c2d12', border: '#fed7aa', welcome: 'linear-gradient(135deg, #9a3412 0%, #f97316 100%)' },
             dark: { bg: '#1c1917', card: '#292524', sidebar: '#0c0a09', text: '#fafaf9', subtext: '#a8a29e', border: '#44403c', welcome: 'linear-gradient(135deg, #431407 0%, #292524 100%)' }
@@ -78,7 +78,7 @@
         root.style.setProperty('--theme-primary-light', `${themeBase.primary}25`);
         root.style.setProperty('--bg-color', mode.bg);
         root.style.setProperty('--card-bg', mode.card);
-
+        
         if (mode.sidebar.includes('gradient')) {
             root.style.setProperty('--sidebar-bg-image', mode.sidebar);
             root.style.setProperty('--sidebar-bg-color', 'transparent');
@@ -100,7 +100,7 @@
     const icons = {
         student: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M231.9 113.4L135.9 56.7a15.8 15.8 0 0 0-15.8 0L24.1 113.4a7.9 7.9 0 0 0 0 13.6l44.3 26.1v49.3a16 16 0 0 0 8.2 14l46.2 24.3a15.6 15.6 0 0 0 10.4 0l46.2-24.3a16 16 0 0 0 8.2-14v-49.3l24.4-14.4v39.7a8 8 0 0 0 16 0v-48a8 8 0 0 0-4.1-7m-103.9 98l-46.2-24.3a.6.6 0 0 1-.3-.3v-42l46.5 27.4Zm54.7-24.6l-46.2 24.3l-.5-8.4l46.6-27.4Zm-54.7-41.2l-86.5-51l86.5-51.1l86.5 51.1Z"/></svg>`,
         class: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M245.2 65.6l-20-13.3a15.9 15.9 0 0 0-17.7 0l-72 48a15.9 15.9 0 0 0-7.1 13.3v42.1l-68.4-45.6V68a8 8 0 0 0-16 0v48a8 8 0 0 0 3.6 6.7l72 48a16.1 16.1 0 0 0 17.8 0l72-48a16.1 16.1 0 0 0 7.1-13.4v-38.4l20 13.3a8 8 0 0 0 8.8-13.3m-108.9 93.4l-64-42.7l64-42.7l64 42.7Z"/></svg>`,
-        menu: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M224 128a8 8 0 0 1-8 8H40a8 8 0 0 1 0-16h176a8 8 0 0 1 8 8M40 72h176a8 8 0 0 0 0-16H40a8 8 0 0 0 0 16m176 112H40a8 8 0 0 0 0 16h176a8 8 0 0 0 0-16h176a8 8 0 0 0 0-16h176a8 8 0 0 0 0-16"/></svg>`,
+        menu: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M224 128a8 8 0 0 1-8 8H40a8 8 0 0 1 0-16h176a8 8 0 0 1 8 8M40 72h176a8 8 0 0 0 0-16H40a8 8 0 0 0 0 16m176 112H40a8 8 0 0 0 0 16h176a8 8 0 0 0 0-16h176a8 8 0 0 0 0-16"/></svg>`,
         logout: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M112 216a8 8 0 0 1-8 8H48a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h56a8 8 0 0 1 0 16H48v160h56a8 8 0 0 1 8 8m109.7-93.7l-56-56a8 8 0 0 0-11.4 11.4l42.3 42.3H88a8 8 0 0 0 0 16h108.7l-42.3 42.3a8 8 0 0 0 11.4 11.4l56-56a8 8 0 0 0 0-11.4"/></svg>`,
         home: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M218.8 103.7L130.1 24a8 8 0 0 0-4.2-4.2a7.9 7.9 0 0 0-7.8 0l-88.7 79.7a8 8 0 0 0 2.4 13.5l3.2 1.4v81.6a16 16 0 0 0 16 16h32a8 8 0 0 0 8-8v-48h48v48a8 8 0 0 0 8 8h32a16 16 0 0 0 16-16v-81.6l3.2-1.4a8.1 8.1 0 0 0 4.5-7.3a8 8 0 0 0-2.1-5.6"/></svg>`,
         clock: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256"><path fill="currentColor" d="M128 24a104 104 0 1 0 104 104A104.1 104.1 0 0 0 128 24m0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88m64-88a8 8 0 0 1-8 8h-56a8 8 0 0 1-8-8V72a8 8 0 0 1 16 0v48h48a8 8 0 0 1 8 8"/></svg>`,
@@ -136,44 +136,44 @@
         return parts.length === 0 ? `<div class="horario-badge">Horário não definido</div>` : parts.map(h => `<div class="horario-badge">${icons.clock} <span>${h}</span></div>`).join("");
     }
 
-    // 3. LÓGICA DO DASHBOARD
+    // --- LÓGICA DO DASHBOARD ---
     if (isDashboard) {
-
+        
         GM_addStyle(`
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
+            
             /* RESET */
             body { font-family: 'Inter', sans-serif !important; background-color: var(--bg-color) !important; color: var(--text-primary) !important; margin: 0; overflow: hidden; }
             #container, #cabecalho, #rodape, #barra-governo, body > table { display: none !important; }
 
-            /* SIDEBAR (Visual do Repositório) */
-            .sidebar {
-                position: fixed; top: 0; left: 0; bottom: 0; width: 280px;
+            /* SIDEBAR */
+            .sidebar { 
+                position: fixed; top: 0; left: 0; bottom: 0; width: 280px; 
                 background: var(--sidebar-bg); background-image: var(--sidebar-bg-image); background-color: var(--sidebar-bg-color);
-                border-right: 1px solid var(--border-color); z-index: 100;
-                display: flex; flex-direction: column; box-shadow: 4px 0 25px rgba(0,0,0,0.15);
-                overflow-y: auto; color: #f8fafc; text-align: left;
+                border-right: 1px solid var(--border-color); z-index: 100; 
+                display: flex; flex-direction: column; box-shadow: 4px 0 25px rgba(0,0,0,0.15); 
+                overflow-y: auto; color: #f8fafc; text-align: left; 
             }
             .sidebar-header { min-height: 80px; display: flex; align-items: center; padding: 0 24px; border-bottom: 1px solid rgba(255,255,255,0.05); }
             .logo-text { font-size: 1.2rem; font-weight: 800; margin-left: 10px; color: #f8fafc; letter-spacing: -0.5px; }
             .logo-text span { color: var(--theme-primary); font-weight: 400; }
-
+            
             .profile-section { padding: 30px 20px 20px; display: flex; flex-direction: column; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; }
             .avatar-ring { padding: 4px; border: 3px solid var(--sidebar-border); border-radius: 50%; margin-bottom: 12px; transition: 0.3s; cursor: pointer; display: inline-block; }
             .avatar-ring:hover { border-color: var(--theme-primary); box-shadow: 0 0 20px var(--theme-primary-light); }
             .avatar-container { width: 85px; height: 85px; border-radius: 50%; overflow: hidden; background: #1e293b; }
             .avatar-container img { width: 100%; height: 100%; object-fit: cover; }
             .user-name { font-weight: 700; font-size: 1.1rem; color: #f1f5f9; margin-bottom: 20px; text-align: center; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-
+            
             .nav-menu { flex: 1; padding: 15px 0; }
             .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: #cbd5e1; font-size: 0.95rem; text-decoration: none; transition: 0.2s; cursor: pointer; font-weight: 500; border-left: 4px solid transparent; }
             .menu-item:hover { background: rgba(255,255,255,0.05); color: white; padding-left: 28px; }
             .menu-item.active { background: linear-gradient(90deg, var(--theme-primary-light) 0%, transparent 100%); border-left-color: var(--theme-primary); color: var(--theme-primary); font-weight: 600; }
-
+            
             .btn-biblioteca { background: var(--theme-primary-light); border: 1px solid var(--theme-primary-light); margin: 10px 15px; border-radius: 10px; color: #f8fafc !important; }
             .btn-biblioteca:hover { background: rgba(255,255,255,0.1); border-color: var(--theme-primary); transform: translateY(-1px); }
             .btn-biblioteca svg { color: var(--theme-primary) !important; }
-
+            
             #btn-config { color: #cbd5e1 !important; padding: 15px 24px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 0.9rem; transition: 0.2s; }
             #btn-config:hover { color: var(--theme-primary) !important; }
             #btn-sair { color: #f87171 !important; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding: 20px 24px; }
@@ -181,12 +181,12 @@
             /* MAIN CONTENT */
             .main-content { margin-left: 280px; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
             .topbar { height: 80px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: sticky; top: 0; z-index: 50; }
-
-            .welcome-card {
+            
+            .welcome-card { 
                 background: var(--welcome-bg);
-                color: white; border-radius: 20px; padding: 35px; margin-bottom: 40px;
-                display: flex; justify-content: space-between; align-items: center;
-                box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2); position: relative; overflow: hidden;
+                color: white; border-radius: 20px; padding: 35px; margin-bottom: 40px; 
+                display: flex; justify-content: space-between; align-items: center; 
+                box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2); position: relative; overflow: hidden; 
             }
             .welcome-card::after { content: ''; position: absolute; right: -20px; top: -50px; width: 300px; height: 300px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
             .welcome-text h1 { margin: 0 0 10px; font-size: 2rem; font-weight: 800; letter-spacing: -1px; }
@@ -195,7 +195,7 @@
 
             .btn-grade { background:var(--card-bg); color:var(--theme-primary); border:1px solid var(--theme-primary); padding:6px 12px; border-radius:8px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; transition:0.2s; font-size:0.85rem; }
             .btn-grade:hover { background:var(--theme-primary-light); }
-
+            
             .horario-badge { display: flex; align-items: center; gap: 6px; background: var(--bg-color); color: var(--text-secondary); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; margin-bottom: 5px; border: 1px solid var(--border-color); width: fit-content; }
             .horario-badge svg { color: var(--theme-primary); }
 
@@ -214,37 +214,38 @@
             .sub-item:hover { background: rgba(255,255,255,0.05); color: var(--theme-primary); }
 
             /* Fixes do menu original flutuante */
-            #menu-dropdown {
-                background-image: var(--sidebar-bg-image) !important;
-                background-color: var(--sidebar-bg-color) !important;
+            #menu-dropdown { 
+                background-image: var(--sidebar-bg-image) !important; 
+                background-color: var(--sidebar-bg-color) !important; 
                 border: 1px solid var(--sidebar-border) !important;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important; /* Sombra para destacar do fundo */
             }
-
+            
             /* Reset geral: deixa texto e células transparentes para herdar do pai */
-            #menu-dropdown * {
-                background: transparent !important;
-                color: #cbd5e1 !important;
-                border-color: var(--sidebar-border) !important;
+            #menu-dropdown * { 
+                background: transparent !important; 
+                color: #cbd5e1 !important; 
+                border-color: var(--sidebar-border) !important; 
             }
 
             /* CORREÇÃO CRÍTICA: Reaplica o fundo especificamente nos containers dos submenus */
-            #menu-dropdown table,
+            #menu-dropdown table, 
             #menu-dropdown .ThemeOfficeMenu,
             #menu-dropdown div[id^="cmSubMenuID"] {
-                background-image: var(--sidebar-bg-image) !important;
-                background-color: var(--sidebar-bg-color) !important;
+                background-image: var(--sidebar-bg-image) !important; 
+                background-color: var(--sidebar-bg-color) !important; 
             }
 
             /* Estilo do Hover (Item selecionado) */
-            #menu-dropdown .ThemeOfficeMenuItemHover,
-            #menu-dropdown .ThemeOfficeMenuItemHover * {
-                background-color: var(--theme-primary) !important;
-                color: white !important;
+            #menu-dropdown .ThemeOfficeMenuItemHover, 
+            #menu-dropdown .ThemeOfficeMenuItemHover * { 
+                background-color: var(--theme-primary) !important; 
+                color: white !important; 
             }
+
             /* Fix para Titulo H2 Feio */
             h2 { background: transparent !important; border: none !important; box-shadow: none !important; }
-
+            
             /* Modal Switch */
             .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
             .switch input { opacity: 0; width: 0; height: 0; }
@@ -252,14 +253,14 @@
             .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
             input:checked + .slider { background-color: var(--theme-primary); }
             input:checked + .slider:before { transform: translateX(20px); }
-
-            /* FIX PDF COLORIDO */
+            
+            /* FIX PDF COLORIDO / IMPRESSÃO */
             @media print {
                 * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                body > :not(#modal-grade) { display: none !important; }
-                #modal-grade { display: flex !important; position: static !important; background: white !important; height: 100vh !important; width: 100vw !important; z-index: 999999 !important; box-shadow: none !important; backdrop-filter: none !important; }
-                #modal-grade > div { width: 100% !important; max-width: 100% !important; height: auto !important; box-shadow: none !important; border-radius: 0 !important; }
-                #modal-grade > div > div:last-child { overflow: visible !important; height: auto !important; }
+                body > :not(#modal-grade) { display: none !important; } 
+                #modal-grade { display: flex !important; position: absolute !important; top: 0 !important; left: 0 !important; background: white !important; height: 100% !important; width: 100% !important; z-index: 999999 !important; box-shadow: none !important; backdrop-filter: none !important; } 
+                #modal-grade > div { width: 100% !important; max-width: 100% !important; height: auto !important; box-shadow: none !important; border: none !important; border-radius: 0 !important; } 
+                #modal-grade > div > div:last-child { overflow: visible !important; height: auto !important; } 
                 #btn-fechar-modal, #btn-imprimir-grade { display: none !important; }
             }
         `);
@@ -280,7 +281,7 @@
             const elNome = document.querySelector(".nome_usuario p") || document.querySelector(".nome small b");
             const elFoto = document.querySelector(".foto img");
             const elSemestre = document.querySelector(".periodo .negrito");
-
+            
             aluno.nome = elNome ? capitalizeName(elNome.innerText.trim()) : (aluno.nome || "Discente");
             aluno.avatar = elFoto ? elFoto.src : aluno.avatar;
             aluno.semestre = elSemestre ? elSemestre.innerText.trim() : aluno.semestre;
@@ -315,7 +316,7 @@
             <div id="btn-config">${icons.gear} Aparência</div>
             <a href="/sigaa/logar.do?dispatch=logOff" class="menu-item" id="btn-sair">${icons.logout} Sair</a>
         </aside>
-
+        
         <div class="main-content">
             <header class="topbar">
                 <button class="menu-toggle" id="dashMenuBtn">${icons.menu}</button>
@@ -340,13 +341,13 @@
                 </div>
             </div>
         </div>`;
-
+        
         const div = document.createElement('div'); div.innerHTML = dashHTML; document.body.appendChild(div);
 
         // --- GERAÇÃO DE CARDS ---
         const cardArea = document.getElementById('dash-cards');
         const colors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b', '#ef4444'];
-
+        
         function parseToGrid(horarioStr, nomeMateria, cor) {
             const text = cleanText(horarioStr);
             const regex = /(SEG|TER|QUA|QUI|SEX|SAB|DOM)[\s\.]*(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/gi;
@@ -381,7 +382,7 @@
                     const horarioHTML = formatHorarios(horarioStr);
                     const bg = colors[i % colors.length];
                     let nomeMateria = nome.includes(' - ') ? nome.split(' - ').slice(1).join(' - ').trim() : nome;
-
+                    
                     parseToGrid(horarioStr, nomeMateria, bg);
 
                     const card = document.createElement('div');
@@ -403,10 +404,25 @@
         document.getElementById('btn-editar-perfil')?.addEventListener('click', (e) => { e.preventDefault(); const l = document.querySelector('a.perfil'); if (l) l.click(); else alert("Opção indisponível."); });
         document.getElementById('btn-config').addEventListener('click', () => { criarModalTemas(); document.getElementById('modal-temas').style.display = 'flex'; });
         document.getElementById('btn-ver-grade').addEventListener('click', () => { criarModalGrade(); document.getElementById('modal-grade').style.display = 'flex'; });
-        const initMenu = setInterval(() => { let menu = document.getElementById('menu-dropdown'); if (!menu) menu = document.querySelector('[id*="menu_form_menu_discente"] > div'); if (menu) { clearInterval(initMenu); document.body.appendChild(menu); menu.style.display = 'none'; menu.style.zIndex = '999999'; menu.style.position = 'fixed'; } }, 500);
+        
+        // FIX DO MENU FLUTUANTE
+        const initMenu = setInterval(() => { 
+            let menu = document.getElementById('menu-dropdown'); 
+            if (!menu) menu = document.querySelector('[id*="menu_form_menu_discente"] > div'); 
+            if (menu) { 
+                clearInterval(initMenu); 
+                menu.id = 'menu-dropdown'; // Força o ID para pegar o CSS
+                document.body.appendChild(menu); 
+                menu.style.display = 'none'; 
+                menu.style.zIndex = '999999'; 
+                menu.style.position = 'fixed'; 
+            } 
+        }, 500);
+
         const menuBtn = document.getElementById('dashMenuBtn');
         if (menuBtn) { menuBtn.addEventListener('click', (e) => { e.stopPropagation(); let menu = document.getElementById('menu-dropdown') || document.querySelector('[id*="menu_form_menu_discente"] > div'); if (!menu) return; const isVisible = menu.style.display === 'block'; menu.style.display = isVisible ? 'none' : 'block'; if (!isVisible) { const rect = menuBtn.getBoundingClientRect(); menu.style.top = (rect.bottom + 10) + 'px'; menu.style.left = rect.left + 'px'; } }); document.addEventListener('click', (e) => { const menu = document.getElementById('menu-dropdown') || document.querySelector('[id*="menu_form_menu_discente"] > div'); if (menu && menu.style.display === 'block' && !menu.contains(e.target)) { menu.style.display = 'none'; } }); }
 
+        // --- FUNÇÃO PARA GRADE HORÁRIA VISUAL ---
         function criarModalGrade() {
             const exist = document.getElementById('modal-grade'); if(exist) exist.remove();
             const modal = document.createElement('div'); modal.id = 'modal-grade';
@@ -424,54 +440,79 @@
                 }).join('');
                 return `<div style="position:relative; background:var(--card-bg); border-left:1px solid var(--border-color); min-width:100px; height:100%;"><div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; z-index:0;">${gridLinesHTML}</div>${blocosHTML}</div>`;
             }).join('');
-            modal.innerHTML = `<div style="background:var(--card-bg); width:95%; max-width:1600px; height:90vh; border-radius:16px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.3);"><div style="padding:15px 25px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; background:var(--card-bg);"><h2 style="margin:0; font-size:1.3rem; color:var(--text-primary); display:flex; align-items:center; gap:10px; background:transparent !important; border:none !important;">${icons.table} Grade Curricular</h2><div style="display:flex; gap:10px;"><button id="btn-imprimir-grade" style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:8px; padding:8px 12px; cursor:pointer; color:var(--text-primary); display:flex; align-items:center; gap:6px; font-weight:600; font-size:0.85rem; transition:0.2s;">${icons.printer} Salvar PDF</button><button id="btn-fechar-modal" style="background:none; border:none; font-size:2rem; cursor:pointer; color:var(--text-secondary);">&times;</button></div></div><div style="display:grid; grid-template-columns: 50px repeat(5, 1fr); background:var(--card-bg); border-bottom:2px solid var(--border-color);"><div style="padding:10px;"></div>${["SEG","TER","QUA","QUI","SEX"].map(d => `<div style="padding:12px; text-align:center; font-weight:800; color:var(--text-primary); font-size:0.9rem;">${d}</div>`).join('')}</div><div style="flex:1; overflow-y:auto; position:relative;"><div style="display:grid; grid-template-columns: 50px repeat(5, 1fr); height:${(endHour - startHour) * 50}px;"><div style="background:var(--bg-color); border-right:1px solid var(--border-color); display:flex; flex-direction:column;">${timeLabelsHTML}</div>${daysColsHTML}</div></div></div>`;
+            modal.innerHTML = `
+                <div style="background:var(--card-bg); width:95%; max-width:1600px; height:90vh; border-radius:16px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.3); border: 1px solid var(--border-color);">
+                    <div style="padding:15px 25px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; background:var(--card-bg);">
+                        <h2 style="margin:0; font-size:1.3rem; color:var(--text-primary); display:flex; align-items:center; gap:10px; background:transparent !important; border:none !important;">${icons.table} Grade Curricular</h2>
+                        <div style="display:flex; gap:10px;">
+                            <button id="btn-imprimir-grade" style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:8px; padding:8px 12px; cursor:pointer; color:var(--text-primary); display:flex; align-items:center; gap:6px; font-weight:600; font-size:0.85rem; transition:0.2s;">
+                                ${icons.printer} Salvar PDF
+                            </button>
+                            <button id="btn-fechar-modal" style="background:none; border:none; font-size:2rem; cursor:pointer; color:var(--text-secondary);">&times;</button>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 50px repeat(5, 1fr); background:var(--card-bg); border-bottom:2px solid var(--border-color);">
+                        <div style="padding:10px;"></div>
+                        ${["SEG","TER","QUA","QUI","SEX"].map(d => `<div style="padding:12px; text-align:center; font-weight:800; color:var(--text-primary); font-size:0.9rem;">${d}</div>`).join('')}
+                    </div>
+                    <div style="flex:1; overflow-y:auto; position:relative;">
+                        <div style="display:grid; grid-template-columns: 50px repeat(5, 1fr); height:${(endHour - startHour) * 50}px;">
+                            <div style="background:var(--bg-color); border-right:1px solid var(--border-color); display:flex; flex-direction:column;">${timeLabelsHTML}</div>
+                            ${daysColsHTML}
+                        </div>
+                    </div>
+                </div>`;
             document.body.appendChild(modal);
             document.getElementById('btn-fechar-modal').onclick = () => modal.style.display = 'none';
             modal.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
             document.getElementById('btn-imprimir-grade').addEventListener('click', () => window.print());
         }
 
-    // --- 4. LOGICA DE PÁGINAS INTERNAS (SOMENTE NAVBAR FIXA) ---
-    // --- 4. LOGICA DE PÁGINAS INTERNAS (Barra Fixa + Ferramentas) ---
+    // --- 3. RESTRUTURAÇÃO DE PÁGINAS INTERNAS (Barra Fixa + Ferramentas) ---
     } else {
-        
-        GM_addStyle(`
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-            
-            #internal-navbar { 
-                position: fixed; top: 0; left: 0; right: 0; height: 50px; 
-                background-color: #0f172a; border-bottom: 1px solid #334155; 
-                color: white; z-index: 999999; display: flex; align-items: center; 
-                justify-content: space-between; padding: 0 20px; font-family: 'Inter', sans-serif !important; 
-            } 
-            .nav-link { 
-                background: rgba(255,255,255,0.1); color: white; text-decoration: none; 
-                padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; display: flex; 
-                align-items: center; gap: 6px; cursor: pointer; border: none; font-family: 'Inter', sans-serif !important; transition: 0.2s;
-            }
-            .nav-link:hover { background: rgba(255,255,255,0.2); }
-            body { padding-top: 50px !important; }
-            #painel-usuario { display: none !important; }
-            
-            /* Estilo para as Células de Nota no Modal */
-            .calc-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
-            .calc-label { font-size: 0.85rem; color: #94a3b8; }
-            .calc-val { font-weight: 700; font-size: 1rem; color: #f8fafc; }
-            .calc-res { font-weight: 800; font-size: 1.1rem; color: var(--theme-primary); }
-        `);
 
-        // HTML NAVBAR
-        const nav = document.createElement('div'); nav.id = "internal-navbar";
-        nav.innerHTML = `
-            <div style="display:flex; align-items:center; gap:12px; font-weight:700;"><span>SIGAA Ultimate</span></div>
-            <div style="display:flex; gap:10px;">
-                <button class="nav-link" id="btn-calc-freq">${icons.clock} Frequência</button>
-                <button class="nav-link" id="btn-calc-notas">${icons.class} Notas</button>
-                <a href="/sigaa/verPortalDiscente.do" class="nav-link">${icons.home} Home</a>
-            </div>`;
-        document.body.prepend(nav);
+        // Função ÚNICA que inicializa a barra interna e calculadoras
+        // Isso evita duplicar código entre AVA e páginas genéricas
+        const initInternalPage = () => {
+             GM_addStyle(`
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+                
+                #internal-navbar { 
+                    position: fixed; top: 0; left: 0; right: 0; height: 50px; 
+                    background-color: #0f172a; border-bottom: 1px solid #334155; 
+                    color: white; z-index: 999999; display: flex; align-items: center; 
+                    justify-content: space-between; padding: 0 20px; font-family: 'Inter', sans-serif !important; 
+                } 
+                .nav-link { 
+                    background: rgba(255,255,255,0.1); color: white; text-decoration: none; 
+                    padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; display: flex; 
+                    align-items: center; gap: 6px; cursor: pointer; border: none; font-family: 'Inter', sans-serif !important; transition: 0.2s;
+                }
+                .nav-link:hover { background: rgba(255,255,255,0.2); }
+                body { padding-top: 50px !important; }
+                #painel-usuario { display: none !important; }
+                
+                .calc-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
+                .calc-label { font-size: 0.85rem; color: #94a3b8; }
+                .calc-val { font-weight: 700; font-size: 1rem; color: #f8fafc; }
+                .calc-res { font-weight: 800; font-size: 1.1rem; color: var(--theme-primary); }
+            `);
 
-        // --- A. CALCULADORA DE FREQUÊNCIA ---
+            const nav = document.createElement('div'); nav.id = "internal-navbar";
+            nav.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px; font-weight:700;"><span>SIGAA Ultimate</span></div>
+                <div style="display:flex; gap:10px;">
+                    <button class="nav-link" id="btn-calc-freq">${icons.clock} Frequência</button>
+                    <button class="nav-link" id="btn-calc-notas">${icons.class} Notas</button>
+                    <a href="/sigaa/verPortalDiscente.do" class="nav-link">${icons.home} Home</a>
+                </div>`;
+            if(!document.getElementById('internal-navbar')) document.body.prepend(nav);
+
+            document.getElementById('btn-calc-freq').addEventListener('click', checkFrequency);
+            document.getElementById('btn-calc-notas').addEventListener('click', checkGrades);
+        };
+
+        // --- CALCULADORAS ---
         function checkFrequency() {
             const bodyText = document.body.innerText;
             const faultsMatch = bodyText.match(/Total de Faltas:?\s*(\d+)/i);
@@ -486,7 +527,6 @@
             const maxMatch = bodyText.match(/M.ximo de Faltas Permitido:?\s*(\d+)/i);
             if (maxMatch) { maxFaltas = parseInt(maxMatch[1]); } 
             else { 
-                // Tenta estimar pela carga horaria se não achar explícito
                 const headers = document.querySelectorAll('div.titulo, h4'); 
                 for(let h of headers) { 
                     const match = h.innerText.match(/\(\s*(\d+)\s*h\s*\)/i); 
@@ -509,12 +549,8 @@
             `);
         }
 
-        // --- B. CALCULADORA DE NOTAS ---
         function checkGrades() {
-            // Tenta pegar matricula do cache, senao pede pro usuario (fallback)
             let matricula = aluno.dados ? aluno.dados.matricula : null;
-            
-            // Procura tabela de notas
             const table = document.querySelector('table.tabelaRelatorio');
             if (!table) {
                 alert("⚠️ Tabela de notas não encontrada.\n\nEntre na disciplina e clique em 'Ver Notas' ou 'Participantes'.");
@@ -522,110 +558,79 @@
             }
 
             let n1 = null, n2 = null, userFound = false;
-
-            // Varre as linhas procurando a matricula do usuario
             const rows = table.querySelectorAll('tbody tr');
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
                 if (cells.length > 2) {
                     const matCell = cells[0].innerText.trim();
-                    // Se a matricula bater ou se só tiver 1 linha (visão de aluno unico)
                     if ((matricula && matCell === matricula) || rows.length === 1) {
                         userFound = true;
-                        // Padrão UFC: Coluna 2 = Nota 1, Coluna 3 = Nota 2
-                        // Limpa string (troca virgula por ponto, remove espaços)
                         const clean = (txt) => parseFloat(txt.replace(',','.').trim());
-                        
                         if (cells[2] && cells[2].innerText.match(/[\d,]/)) n1 = clean(cells[2].innerText);
                         if (cells[3] && cells[3].innerText.match(/[\d,]/)) n2 = clean(cells[3].innerText);
                     }
                 }
             });
 
-            if (!userFound) {
-                alert("⚠️ Sua matrícula (" + (matricula || 'N/A') + ") não foi encontrada nesta tabela.");
-                return;
-            }
+            if (!userFound) { alert("⚠️ Sua matrícula (" + (matricula || 'N/A') + ") não foi encontrada nesta tabela."); return; }
 
             let htmlContent = "";
-            
             if (n1 === null && n2 === null) {
                 htmlContent = "<p>Nenhuma nota lançada ainda.</p>";
             } else if (n1 !== null && n2 === null) {
-                // SÓ TEM N1
-                const precisaPara7 = Math.max(0, 14 - n1).toFixed(1); // (N1+N2)/2 = 7 -> N2 = 14-N1
-                const precisaPara4 = Math.max(0, 8 - n1).toFixed(1);  // (N1+N2)/2 = 4 -> N2 = 8-N1
-                
+                const precisaPara7 = Math.max(0, 14 - n1).toFixed(1); 
+                const precisaPara4 = Math.max(0, 8 - n1).toFixed(1);  
                 htmlContent = `
                     <div class="calc-row"><span class="calc-label">Nota Unidade 1</span> <span class="calc-val">${n1}</span></div>
                     <hr style="border-color:rgba(255,255,255,0.1); margin:15px 0;">
-                    
-                    <div style="margin-bottom:15px;">
-                        <div class="calc-label">Para APROVAR DIRETO (Média 7):</div>
-                        <div style="color:#4ade80; font-size:1.2rem; font-weight:800;">Precisa de ${precisaPara7} na N2</div>
-                    </div>
-                    
-                    <div>
-                        <div class="calc-label">Para ir para FINAL (Mínimo):</div>
-                        <div style="color:#facc15; font-size:1.2rem; font-weight:800;">Precisa de ${precisaPara4} na N2</div>
-                        <small style="color:#94a3b8;">Menor que isso reprova direto.</small>
-                    </div>
+                    <div style="margin-bottom:15px;"><div class="calc-label">Para APROVAR DIRETO (Média 7):</div><div style="color:#4ade80; font-size:1.2rem; font-weight:800;">Precisa de ${precisaPara7} na N2</div></div>
+                    <div><div class="calc-label">Para ir para FINAL (Mínimo):</div><div style="color:#facc15; font-size:1.2rem; font-weight:800;">Precisa de ${precisaPara4} na N2</div><small style="color:#94a3b8;">Menor que isso reprova direto.</small></div>
                 `;
             } else if (n1 !== null && n2 !== null) {
-                // TEM N1 E N2
                 const media = (n1 + n2) / 2;
-                let situacao = "", cor = "";
-                let extraInfo = "";
-
-                if (media >= 7) {
-                    situacao = "APROVADO POR MÉDIA"; cor = "#22c55e";
-                    extraInfo = "Parabéns! Você já passou.";
-                } else if (media < 4) {
-                    situacao = "REPROVADO"; cor = "#ef4444";
-                    extraInfo = "Média inferior a 4.0.";
-                } else {
-                    situacao = "AVALIAÇÃO FINAL"; cor = "#f97316";
-                    // Calculo da Final: (Media + AF) / 2 = 5  -> AF = 10 - Media
-                    const precisaAF = (10 - media).toFixed(1);
-                    extraInfo = `<div style="margin-top:10px; font-size:1.1rem;">Precisa tirar <span style="color:white; font-weight:800; font-size:1.4rem;">${precisaAF}</span> na Final.</div>`;
-                }
+                let situacao = "", cor = "", extraInfo = "";
+                if (media >= 7) { situacao = "APROVADO POR MÉDIA"; cor = "#22c55e"; extraInfo = "Parabéns! Você já passou."; } 
+                else if (media < 4) { situacao = "REPROVADO"; cor = "#ef4444"; extraInfo = "Média inferior a 4.0."; } 
+                else { situacao = "AVALIAÇÃO FINAL"; cor = "#f97316"; const precisaAF = (10 - media).toFixed(1); extraInfo = `<div style="margin-top:10px; font-size:1.1rem;">Precisa tirar <span style="color:white; font-weight:800; font-size:1.4rem;">${precisaAF}</span> na Final.</div>`; }
 
                 htmlContent = `
                     <div class="calc-row"><span class="calc-label">Nota Unidade 1</span> <span class="calc-val">${n1}</span></div>
                     <div class="calc-row"><span class="calc-label">Nota Unidade 2</span> <span class="calc-val">${n2}</span></div>
                     <div class="calc-row" style="border:none; margin-top:15px;"><span class="calc-label">MÉDIA PARCIAL</span> <span class="calc-res" style="color:${cor}">${media.toFixed(1)}</span></div>
-                    
-                    <div style="background:${cor}20; border:1px solid ${cor}; color:${cor}; padding:15px; border-radius:8px; text-align:center; font-weight:700; margin-top:10px;">
-                        ${situacao}
-                        ${extraInfo}
-                    </div>
+                    <div style="background:${cor}20; border:1px solid ${cor}; color:${cor}; padding:15px; border-radius:8px; text-align:center; font-weight:700; margin-top:10px;">${situacao}${extraInfo}</div>
                 `;
             }
-
             showModal("Calculadora de Notas", htmlContent);
         }
 
-        // --- HELPER PARA MODAL GENERICO ---
         function showModal(title, content) {
-            const id = 'modal-generic-ultimate';
-            let modal = document.getElementById(id);
-            if(modal) modal.remove();
-            
-            modal = document.createElement('div');
-            modal.id = id;
+            const id = 'modal-generic-ultimate'; let modal = document.getElementById(id); if(modal) modal.remove();
+            modal = document.createElement('div'); modal.id = id;
             modal.style.cssText = `display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999999; align-items:center; justify-content:center; backdrop-filter:blur(3px); font-family: 'Inter', sans-serif;`;
-            modal.innerHTML = `
-                <div style="background:#1e293b; color:white; width:90%; max-width:400px; border-radius:16px; padding:30px; box-shadow:0 20px 50px rgba(0,0,0,0.4); text-align:center; border:1px solid #334155; position:relative;">
-                    <button onclick="document.getElementById('${id}').remove()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:#64748b; font-size:1.5rem; cursor:pointer;">&times;</button>
-                    <h2 style="margin:0 0 20px 0; color:white !important; font-size:1.3rem; font-weight:700; background:transparent !important; border:none !important;">${title}</h2>
-                    ${content}
-                </div>`;
+            modal.innerHTML = `<div style="background:#1e293b; color:white; width:90%; max-width:400px; border-radius:16px; padding:30px; box-shadow:0 20px 50px rgba(0,0,0,0.4); text-align:center; border:1px solid #334155; position:relative;"><button onclick="document.getElementById('${id}').remove()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:#64748b; font-size:1.5rem; cursor:pointer;">&times;</button><h2 style="margin:0 0 20px 0; color:white !important; font-size:1.3rem; font-weight:700; background:transparent !important; border:none !important;">${title}</h2>${content}</div>`;
             document.body.appendChild(modal);
             modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
         }
 
-        document.getElementById('btn-calc-freq').addEventListener('click', checkFrequency);
-        document.getElementById('btn-calc-notas').addEventListener('click', checkGrades);
+        // =========================================================
+        // AQUI ESTÁ A ESTRUTURA ORGANIZADA PARA O FUTURO:
+        // =========================================================
+        
+        if (window.location.href.includes("/ava/")) {
+            // === TURMA VIRTUAL (AVA) ===
+            // Inicializa a barra padrão
+            initInternalPage();
+            
+            // --> AQUI VAI ENTRAR O CÓDIGO ESPECÍFICO PRA TURMA VIRTUAL <--
+            // Exemplo: Botão de baixar tudo, ícones melhores, etc.
+            
+            console.log("SIGAA Ultimate: Modo Turma Virtual Ativado");
+
+        } else {
+            // === PÁGINAS GENÉRICAS ===
+            // Apenas inicializa a barra padrão
+            initInternalPage();
+        }
     }
 
     // --- FUNÇÃO COMPARTILHADA DE TEMAS ---
