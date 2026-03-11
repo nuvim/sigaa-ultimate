@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         SIGAA Ultimate 2.0 - Portal Híbrido
+// @name         SIGAA Ultimate - Portal
 // @namespace    http://tampermonkey.net/
-// @version      2.0
-// @description  Dashboard Premium + Interno Seguro com Ferramentas.
+// @version      3.0
+// @description  Clean Code
 // @author       Gusttavo
 // @match        *://si3.ufc.br/sigaa/*
 // @exclude      *://si3.ufc.br/sigaa/verTelaLogin.do*
@@ -19,29 +19,26 @@
 (function() {
     'use strict';
 
-    // 1. SEGURANÇA E CONTEXTO
     if (window.location.href.includes("verTelaLogin") || window.location.href.includes("paginaInicial") || document.querySelector("#loginFormMask")) return;
     if (window.self !== window.top) return;
 
     const isDashboard = document.querySelector("#agenda-docente") !== null;
-    
-    // CORREÇÃO: Agora detecta páginas de relatório/notas como "Página Interna"
+
     const isInternalPage = !isDashboard && (
-        document.querySelector("#cabecalho") !== null || 
-        document.querySelector(".ui-layout-west") !== null || 
-        document.querySelector("#relatorio") !== null ||        
-        document.querySelector(".tabelaRelatorio") !== null ||  
-        window.location.href.includes("/ava/")                  
+        document.querySelector("#cabecalho") !== null ||
+        document.querySelector(".ui-layout-west") !== null ||
+        document.querySelector("#relatorio") !== null ||
+        document.querySelector(".tabelaRelatorio") !== null ||
+        window.location.href.includes("/ava/")
     );
-    
+
     if (document.getElementById('painel-erro') || document.body.innerText.includes("Comportamento Inesperado")) {
         localStorage.removeItem('sigaa_plus_cache');
         return;
     }
-    
+
     if (!isDashboard && !isInternalPage) return;
 
-    // 2. PALETAS
     const PALETTES = {
         ufc: {
             name: "UFC (Original)", primary: '#3b82f6', hover: '#2563eb',
@@ -100,7 +97,7 @@
     const icons = {
         student: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M231.9 113.4L135.9 56.7a15.8 15.8 0 0 0-15.8 0L24.1 113.4a7.9 7.9 0 0 0 0 13.6l44.3 26.1v49.3a16 16 0 0 0 8.2 14l46.2 24.3a15.6 15.6 0 0 0 10.4 0l46.2-24.3a16 16 0 0 0 8.2-14v-49.3l24.4-14.4v39.7a8 8 0 0 0 16 0v-48a8 8 0 0 0-4.1-7m-103.9 98l-46.2-24.3a.6.6 0 0 1-.3-.3v-42l46.5 27.4Zm54.7-24.6l-46.2 24.3l-.5-8.4l46.6-27.4Zm-54.7-41.2l-86.5-51l86.5-51.1l86.5 51.1Z"/></svg>`,
         class: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M245.2 65.6l-20-13.3a15.9 15.9 0 0 0-17.7 0l-72 48a15.9 15.9 0 0 0-7.1 13.3v42.1l-68.4-45.6V68a8 8 0 0 0-16 0v48a8 8 0 0 0 3.6 6.7l72 48a16.1 16.1 0 0 0 17.8 0l72-48a16.1 16.1 0 0 0 7.1-13.4v-38.4l20 13.3a8 8 0 0 0 8.8-13.3m-108.9 93.4l-64-42.7l64-42.7l64 42.7Z"/></svg>`,
-        menu: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M224 128a8 8 0 0 1-8 8H40a8 8 0 0 1 0-16h176a8 8 0 0 1 8 8M40 72h176a8 8 0 0 0 0-16H40a8 8 0 0 0 0 16m176 112H40a8 8 0 0 0 0 16h176a8 8 0 0 0 0-16h176a8 8 0 0 0 0-16h176a8 8 0 0 0 0-16"/></svg>`,
+        menu: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M224 128a8 8 0 0 1-8 8H40a8 8 0 0 1 0-16h176a8 8 0 0 1 8 8M40 72h176a8 8 0 0 0 0-16H40a8 8 0 0 0 0 16m176 112H40a8 8 0 0 0 0 16h176a8 8 0 0 0 0-16h176a8 8 0 0 0 0-16"/></svg>`,
         logout: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M112 216a8 8 0 0 1-8 8H48a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h56a8 8 0 0 1 0 16H48v160h56a8 8 0 0 1 8 8m109.7-93.7l-56-56a8 8 0 0 0-11.4 11.4l42.3 42.3H88a8 8 0 0 0 0 16h108.7l-42.3 42.3a8 8 0 0 0 11.4 11.4l56-56a8 8 0 0 0 0-11.4"/></svg>`,
         home: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M218.8 103.7L130.1 24a8 8 0 0 0-4.2-4.2a7.9 7.9 0 0 0-7.8 0l-88.7 79.7a8 8 0 0 0 2.4 13.5l3.2 1.4v81.6a16 16 0 0 0 16 16h32a8 8 0 0 0 8-8v-48h48v48a8 8 0 0 0 8 8h32a16 16 0 0 0 16-16v-81.6l3.2-1.4a8.1 8.1 0 0 0 4.5-7.3a8 8 0 0 0-2.1-5.6"/></svg>`,
         clock: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256"><path fill="currentColor" d="M128 24a104 104 0 1 0 104 104A104.1 104.1 0 0 0 128 24m0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88m64-88a8 8 0 0 1-8 8h-56a8 8 0 0 1-8-8V72a8 8 0 0 1 16 0v48h48a8 8 0 0 1 8 8"/></svg>`,
@@ -136,7 +133,6 @@
         return parts.length === 0 ? `<div class="horario-badge">Horário não definido</div>` : parts.map(h => `<div class="horario-badge">${icons.clock} <span>${h}</span></div>`).join("");
     }
 
-    // 3. LÓGICA DO DASHBOARD
     if (isDashboard) {
 
         GM_addStyle(`
@@ -146,7 +142,7 @@
             body { font-family: 'Inter', sans-serif !important; background-color: var(--bg-color) !important; color: var(--text-primary) !important; margin: 0; overflow: hidden; }
             #container, #cabecalho, #rodape, #barra-governo, body > table { display: none !important; }
 
-            /* SIDEBAR (Visual do Repositório) */
+            /* SIDEBAR */
             .sidebar {
                 position: fixed; top: 0; left: 0; bottom: 0; width: 280px;
                 background: var(--sidebar-bg); background-image: var(--sidebar-bg-image); background-color: var(--sidebar-bg-color);
@@ -242,6 +238,7 @@
                 background-color: var(--theme-primary) !important;
                 color: white !important;
             }
+
             /* Fix para Titulo H2 Feio */
             h2 { background: transparent !important; border: none !important; box-shadow: none !important; }
 
@@ -253,18 +250,34 @@
             input:checked + .slider { background-color: var(--theme-primary); }
             input:checked + .slider:before { transform: translateX(20px); }
 
-            /* FIX PDF COLORIDO */
+            /* FIX PDF COLORIDO / IMPRESSÃO */
             @media print {
                 * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                 body > :not(#modal-grade) { display: none !important; }
-                #modal-grade { display: flex !important; position: static !important; background: white !important; height: 100vh !important; width: 100vw !important; z-index: 999999 !important; box-shadow: none !important; backdrop-filter: none !important; }
-                #modal-grade > div { width: 100% !important; max-width: 100% !important; height: auto !important; box-shadow: none !important; border-radius: 0 !important; }
+                #modal-grade { display: flex !important; position: absolute !important; top: 0 !important; left: 0 !important; background: white !important; height: 100% !important; width: 100% !important; z-index: 999999 !important; box-shadow: none !important; backdrop-filter: none !important; }
+                #modal-grade > div { width: 100% !important; max-width: 100% !important; height: auto !important; box-shadow: none !important; border: none !important; border-radius: 0 !important; }
                 #modal-grade > div > div:last-child { overflow: visible !important; height: auto !important; }
                 #btn-fechar-modal, #btn-imprimir-grade { display: none !important; }
             }
+
+            /* Cards das Turmas */
+            .sigaa-card {
+                background: var(--card-bg);
+                border-radius: 16px;
+                padding: 25px;
+                border: 1px solid var(--border-color);
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 10px 15px -3px rgba(0,0,0,0.03);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .sigaa-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            }
         `);
 
-        // RASPAGEM DE DADOS
         try {
             const tds = document.querySelectorAll("#agenda-docente td");
             for (let i = 0; i < tds.length; i++) {
@@ -286,7 +299,7 @@
             aluno.semestre = elSemestre ? elSemestre.innerText.trim() : aluno.semestre;
             aluno.dados = carteirinha;
             localStorage.setItem('sigaa_plus_cache', JSON.stringify(aluno));
-            // Oculta site original apenas se sucesso
+
             const oldElements = document.querySelectorAll("#container, #cabecalho, #rodape, #barra-governo, body > table");
             oldElements.forEach(el => el.style.display = 'none');
         } catch(e) {}
@@ -343,7 +356,6 @@
 
         const div = document.createElement('div'); div.innerHTML = dashHTML; document.body.appendChild(div);
 
-        // --- GERAÇÃO DE CARDS ---
         const cardArea = document.getElementById('dash-cards');
         const colors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b', '#ef4444'];
 
@@ -385,11 +397,9 @@
                     parseToGrid(horarioStr, nomeMateria, bg);
 
                     const card = document.createElement('div');
-                    card.style.cssText = `background:var(--card-bg); border-radius:16px; padding:25px; border:1px solid var(--border-color); cursor:pointer; position:relative; overflow:hidden; box-shadow:0 10px 15px -3px rgba(0,0,0,0.03); transition:0.3s;`;
+                    card.className = 'sigaa-card';
                     card.innerHTML = `<div style="position:absolute; top:0; left:0; right:0; height:4px; background:${bg}"></div><h3 style="margin:5px 0 15px 0; color:var(--text-primary); font-weight:700; font-size:1rem; line-height:1.4; min-height:2.8em; background:transparent !important; border:none !important;">${nome}</h3><div style="color:var(--text-secondary); font-size:0.85rem; display:flex; gap:8px; align-items:center; margin-bottom:15px;">${icons.map} ${local}</div><div style="display:flex; flex-wrap:wrap; gap:5px;">${horarioHTML}</div>`;
                     card.onclick = () => document.getElementById(uid).click();
-                    card.onmouseover = () => { card.style.transform = 'translateY(-5px)'; card.style.boxShadow = '0 20px 25px -5px rgba(0,0,0,0.1)'; };
-                    card.onmouseout = () => { card.style.transform = 'translateY(0)'; card.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.03)'; };
                     cardArea.appendChild(card);
                 }
             });
@@ -403,7 +413,20 @@
         document.getElementById('btn-editar-perfil')?.addEventListener('click', (e) => { e.preventDefault(); const l = document.querySelector('a.perfil'); if (l) l.click(); else alert("Opção indisponível."); });
         document.getElementById('btn-config').addEventListener('click', () => { criarModalTemas(); document.getElementById('modal-temas').style.display = 'flex'; });
         document.getElementById('btn-ver-grade').addEventListener('click', () => { criarModalGrade(); document.getElementById('modal-grade').style.display = 'flex'; });
-        const initMenu = setInterval(() => { let menu = document.getElementById('menu-dropdown'); if (!menu) menu = document.querySelector('[id*="menu_form_menu_discente"] > div'); if (menu) { clearInterval(initMenu); document.body.appendChild(menu); menu.style.display = 'none'; menu.style.zIndex = '999999'; menu.style.position = 'fixed'; } }, 500);
+
+        const initMenu = setInterval(() => {
+            let menu = document.getElementById('menu-dropdown');
+            if (!menu) menu = document.querySelector('[id*="menu_form_menu_discente"] > div');
+            if (menu) {
+                clearInterval(initMenu);
+                menu.id = 'menu-dropdown';
+                document.body.appendChild(menu);
+                menu.style.display = 'none';
+                menu.style.zIndex = '999999';
+                menu.style.position = 'fixed';
+            }
+        }, 500);
+
         const menuBtn = document.getElementById('dashMenuBtn');
         if (menuBtn) { menuBtn.addEventListener('click', (e) => { e.stopPropagation(); let menu = document.getElementById('menu-dropdown') || document.querySelector('[id*="menu_form_menu_discente"] > div'); if (!menu) return; const isVisible = menu.style.display === 'block'; menu.style.display = isVisible ? 'none' : 'block'; if (!isVisible) { const rect = menuBtn.getBoundingClientRect(); menu.style.top = (rect.bottom + 10) + 'px'; menu.style.left = rect.left + 'px'; } }); document.addEventListener('click', (e) => { const menu = document.getElementById('menu-dropdown') || document.querySelector('[id*="menu_form_menu_discente"] > div'); if (menu && menu.style.display === 'block' && !menu.contains(e.target)) { menu.style.display = 'none'; } }); }
 
@@ -424,229 +447,305 @@
                 }).join('');
                 return `<div style="position:relative; background:var(--card-bg); border-left:1px solid var(--border-color); min-width:100px; height:100%;"><div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; z-index:0;">${gridLinesHTML}</div>${blocosHTML}</div>`;
             }).join('');
-            modal.innerHTML = `<div style="background:var(--card-bg); width:95%; max-width:1600px; height:90vh; border-radius:16px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.3);"><div style="padding:15px 25px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; background:var(--card-bg);"><h2 style="margin:0; font-size:1.3rem; color:var(--text-primary); display:flex; align-items:center; gap:10px; background:transparent !important; border:none !important;">${icons.table} Grade Curricular</h2><div style="display:flex; gap:10px;"><button id="btn-imprimir-grade" style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:8px; padding:8px 12px; cursor:pointer; color:var(--text-primary); display:flex; align-items:center; gap:6px; font-weight:600; font-size:0.85rem; transition:0.2s;">${icons.printer} Salvar PDF</button><button id="btn-fechar-modal" style="background:none; border:none; font-size:2rem; cursor:pointer; color:var(--text-secondary);">&times;</button></div></div><div style="display:grid; grid-template-columns: 50px repeat(5, 1fr); background:var(--card-bg); border-bottom:2px solid var(--border-color);"><div style="padding:10px;"></div>${["SEG","TER","QUA","QUI","SEX"].map(d => `<div style="padding:12px; text-align:center; font-weight:800; color:var(--text-primary); font-size:0.9rem;">${d}</div>`).join('')}</div><div style="flex:1; overflow-y:auto; position:relative;"><div style="display:grid; grid-template-columns: 50px repeat(5, 1fr); height:${(endHour - startHour) * 50}px;"><div style="background:var(--bg-color); border-right:1px solid var(--border-color); display:flex; flex-direction:column;">${timeLabelsHTML}</div>${daysColsHTML}</div></div></div>`;
+            modal.innerHTML = `
+                <div style="background:var(--card-bg); width:95%; max-width:1600px; height:90vh; border-radius:16px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.3); border: 1px solid var(--border-color);">
+                    <div style="padding:15px 25px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; background:var(--card-bg);">
+                        <h2 style="margin:0; font-size:1.3rem; color:var(--text-primary); display:flex; align-items:center; gap:10px; background:transparent !important; border:none !important;">${icons.table} Grade Curricular</h2>
+                        <div style="display:flex; gap:10px;">
+                            <button id="btn-imprimir-grade" style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:8px; padding:8px 12px; cursor:pointer; color:var(--text-primary); display:flex; align-items:center; gap:6px; font-weight:600; font-size:0.85rem; transition:0.2s;">
+                                ${icons.printer} Salvar PDF
+                            </button>
+                            <button id="btn-fechar-modal" style="background:none; border:none; font-size:2rem; cursor:pointer; color:var(--text-secondary);">&times;</button>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 50px repeat(5, 1fr); background:var(--card-bg); border-bottom:2px solid var(--border-color);">
+                        <div style="padding:10px;"></div>
+                        ${["SEG","TER","QUA","QUI","SEX"].map(d => `<div style="padding:12px; text-align:center; font-weight:800; color:var(--text-primary); font-size:0.9rem;">${d}</div>`).join('')}
+                    </div>
+                    <div style="flex:1; overflow-y:auto; position:relative;">
+                        <div style="display:grid; grid-template-columns: 50px repeat(5, 1fr); height:${(endHour - startHour) * 50}px;">
+                            <div style="background:var(--bg-color); border-right:1px solid var(--border-color); display:flex; flex-direction:column;">${timeLabelsHTML}</div>
+                            ${daysColsHTML}
+                        </div>
+                    </div>
+                </div>`;
             document.body.appendChild(modal);
             document.getElementById('btn-fechar-modal').onclick = () => modal.style.display = 'none';
             modal.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
             document.getElementById('btn-imprimir-grade').addEventListener('click', () => window.print());
         }
 
-    // --- 4. LOGICA DE PÁGINAS INTERNAS (SOMENTE NAVBAR FIXA) ---
-    // --- 4. LOGICA DE PÁGINAS INTERNAS (Barra Fixa + Ferramentas) ---
     } else {
-        
-        GM_addStyle(`
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        const initInternalPage = () => {
+             GM_addStyle(`
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+                #internal-navbar {
+                    position: fixed; top: 0; left: 0; right: 0; height: 50px;
+                    background-color: #0f172a; border-bottom: 1px solid #334155;
+                    color: white; z-index: 999999; display: flex; align-items: center;
+                    justify-content: space-between; padding: 0 20px; font-family: 'Inter', sans-serif !important;
+                }
+                .nav-link {
+                    background: rgba(255,255,255,0.1); color: white; text-decoration: none;
+                    padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; display: flex;
+                    align-items: center; gap: 6px; cursor: pointer; border: none; font-family: 'Inter', sans-serif !important; transition: 0.2s;
+                }
+                .nav-link:hover { background: rgba(255,255,255,0.2); }
+                body { padding-top: 50px !important; }
+                #painel-usuario { display: none !important; }
+
+                .calc-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
+                .calc-label { font-size: 0.85rem; color: #94a3b8; }
+                .calc-val { font-weight: 700; font-size: 1rem; color: #f8fafc; }
+                .calc-res { font-weight: 800; font-size: 1.1rem; color: var(--theme-primary); }
+            `);
+
+            const nav = document.createElement('div'); nav.id = "internal-navbar";
+            nav.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px; font-weight:700;"><span>SIGAA Ultimate</span></div>
+                <div style="display:flex; gap:10px;">
+                    <button class="nav-link" id="btn-calc-freq">${icons.clock} Frequência</button>
+                    <button class="nav-link" id="btn-calc-notas">${icons.class} Notas</button>
+                    <a href="/sigaa/verPortalDiscente.do" class="nav-link">${icons.home} Home</a>
+                </div>`;
+            if(!document.getElementById('internal-navbar')) document.body.prepend(nav);
+
+            document.getElementById('btn-calc-freq').addEventListener('click', checkFrequency);
+            document.getElementById('btn-calc-notas').addEventListener('click', checkGrades);
+        };
+
+        function extractTotalFaltas(bodyText) {
+            const match = bodyText.match(/Total de Faltas:?\s*(\d+)/i);
+            return match ? parseInt(match[1]) : null;
+        }
+
+        function extractMaxFaltas(bodyText) {
+            const maxMatch = bodyText.match(/M.ximo de Faltas Permitido:?\s*(\d+)/i);
+            if (maxMatch) return parseInt(maxMatch[1]);
             
-            #internal-navbar { 
-                position: fixed; top: 0; left: 0; right: 0; height: 50px; 
-                background-color: #0f172a; border-bottom: 1px solid #334155; 
-                color: white; z-index: 999999; display: flex; align-items: center; 
-                justify-content: space-between; padding: 0 20px; font-family: 'Inter', sans-serif !important; 
-            } 
-            .nav-link { 
-                background: rgba(255,255,255,0.1); color: white; text-decoration: none; 
-                padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; display: flex; 
-                align-items: center; gap: 6px; cursor: pointer; border: none; font-family: 'Inter', sans-serif !important; transition: 0.2s;
+            const headers = document.querySelectorAll('div.titulo, h4');
+            for (const header of headers) {
+                const match = header.innerText.match(/\(\s*(\d+)\s*h\s*\)/i);
+                if (match) return Math.floor(parseInt(match[1]) * 0.25);
             }
-            .nav-link:hover { background: rgba(255,255,255,0.2); }
-            body { padding-top: 50px !important; }
-            #painel-usuario { display: none !important; }
-            
-            /* Estilo para as Células de Nota no Modal */
-            .calc-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
-            .calc-label { font-size: 0.85rem; color: #94a3b8; }
-            .calc-val { font-weight: 700; font-size: 1rem; color: #f8fafc; }
-            .calc-res { font-weight: 800; font-size: 1.1rem; color: var(--theme-primary); }
-        `);
+            return 16;
+        }
 
-        // HTML NAVBAR
-        const nav = document.createElement('div'); nav.id = "internal-navbar";
-        nav.innerHTML = `
-            <div style="display:flex; align-items:center; gap:12px; font-weight:700;"><span>SIGAA Ultimate</span></div>
-            <div style="display:flex; gap:10px;">
-                <button class="nav-link" id="btn-calc-freq">${icons.clock} Frequência</button>
-                <button class="nav-link" id="btn-calc-notas">${icons.class} Notas</button>
-                <a href="/sigaa/verPortalDiscente.do" class="nav-link">${icons.home} Home</a>
-            </div>`;
-        document.body.prepend(nav);
+        function getFrequencyStatus(totalFaltas, maxFaltas) {
+            if (totalFaltas > maxFaltas) return { text: "Reprovado por Falta", color: "#ef4444" };
+            if (totalFaltas >= (maxFaltas * 0.8)) return { text: "Cuidado", color: "#f97316" };
+            return { text: "Seguro", color: "#22c55e" };
+        }
 
-        // --- A. CALCULADORA DE FREQUÊNCIA ---
         function checkFrequency() {
             const bodyText = document.body.innerText;
-            const faultsMatch = bodyText.match(/Total de Faltas:?\s*(\d+)/i);
-            
-            if (!faultsMatch) { 
-                alert("⚠️ Página não reconhecida ou sem dados de frequência.\n\nNavegue até a página de Frequência da disciplina."); 
-                return; 
+            const totalFaltas = extractTotalFaltas(bodyText);
+
+            if (totalFaltas === null) {
+                alert("⚠️ Página não reconhecida ou sem dados de frequência.\n\nNavegue até a página de Frequência da disciplina.");
+                return;
             }
 
-            let totalFaltas = parseInt(faultsMatch[1]);
-            let maxFaltas = 16; 
-            const maxMatch = bodyText.match(/M.ximo de Faltas Permitido:?\s*(\d+)/i);
-            if (maxMatch) { maxFaltas = parseInt(maxMatch[1]); } 
-            else { 
-                // Tenta estimar pela carga horaria se não achar explícito
-                const headers = document.querySelectorAll('div.titulo, h4'); 
-                for(let h of headers) { 
-                    const match = h.innerText.match(/\(\s*(\d+)\s*h\s*\)/i); 
-                    if (match) { maxFaltas = Math.floor(parseInt(match[1]) * 0.25); break; } 
-                } 
-            }
+            const maxFaltas = extractMaxFaltas(bodyText);
             const restantes = maxFaltas - totalFaltas;
-            let statusText = "Seguro", statusColor = "#22c55e"; 
-            if (totalFaltas >= (maxFaltas * 0.8)) { statusText = "Cuidado"; statusColor = "#f97316"; }
-            if (totalFaltas > maxFaltas) { statusText = "Reprovado por Falta"; statusColor = "#ef4444"; }
-            
+            const status = getFrequencyStatus(totalFaltas, maxFaltas);
+
             showModal("Monitor de Frequência", `
                 <div style="display:flex; justify-content:space-around; margin-bottom:20px;">
                     <div><div style="font-size:0.8rem; color:#94a3b8; font-weight:700;">FALTAS</div><div style="font-size:2rem; font-weight:800; color:white;">${totalFaltas}</div></div>
                     <div><div style="font-size:0.8rem; color:#94a3b8; font-weight:700;">LIMITE</div><div style="font-size:2rem; font-weight:800; color:white;">${maxFaltas}</div></div>
                 </div>
-                <div style="background:${statusColor}20; color:${statusColor}; padding:15px; border-radius:8px; font-weight:700; margin-bottom:10px; border:1px solid ${statusColor};">
-                    ${statusText}: Restam ${restantes} faltas
+                <div style="background:${status.color}20; color:${status.color}; padding:15px; border-radius:8px; font-weight:700; margin-bottom:10px; border:1px solid ${status.color};">
+                    ${status.text}: Restam ${restantes} faltas
                 </div>
             `);
         }
 
-        // --- B. CALCULADORA DE NOTAS ---
-        function checkGrades() {
-            // Tenta pegar matricula do cache, senao pede pro usuario (fallback)
-            let matricula = aluno.dados ? aluno.dados.matricula : null;
-            
-            // Procura tabela de notas
-            const table = document.querySelector('table.tabelaRelatorio');
-            if (!table) {
-                alert("⚠️ Tabela de notas não encontrada.\n\nEntre na disciplina e clique em 'Ver Notas' ou 'Participantes'.");
-                return;
-            }
-
-            let n1 = null, n2 = null, userFound = false;
-
-            // Varre as linhas procurando a matricula do usuario
+        function extractUserGrades(table, matricula) {
+            let n1 = null, n2 = null;
+            let userFound = false;
             const rows = table.querySelectorAll('tbody tr');
+            
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
                 if (cells.length > 2) {
                     const matCell = cells[0].innerText.trim();
-                    // Se a matricula bater ou se só tiver 1 linha (visão de aluno unico)
                     if ((matricula && matCell === matricula) || rows.length === 1) {
                         userFound = true;
-                        // Padrão UFC: Coluna 2 = Nota 1, Coluna 3 = Nota 2
-                        // Limpa string (troca virgula por ponto, remove espaços)
                         const clean = (txt) => parseFloat(txt.replace(',','.').trim());
-                        
                         if (cells[2] && cells[2].innerText.match(/[\d,]/)) n1 = clean(cells[2].innerText);
                         if (cells[3] && cells[3].innerText.match(/[\d,]/)) n2 = clean(cells[3].innerText);
                     }
                 }
             });
+            return { userFound, n1, n2 };
+        }
 
-            if (!userFound) {
-                alert("⚠️ Sua matrícula (" + (matricula || 'N/A') + ") não foi encontrada nesta tabela.");
+        function generateGradeHtml(n1, n2) {
+            if (n1 === null && n2 === null) {
+                return "<p>Nenhuma nota lançada ainda.</p>";
+            } 
+            
+            if (n1 !== null && n2 === null) {
+                const precisaPara7 = Math.max(0, 14 - n1).toFixed(1);
+                const precisaPara4 = Math.max(0, 8 - n1).toFixed(1);
+                return `
+                    <div class="calc-row"><span class="calc-label">Nota Unidade 1</span> <span class="calc-val">${n1}</span></div>
+                    <hr style="border-color:rgba(255,255,255,0.1); margin:15px 0;">
+                    <div style="margin-bottom:15px;"><div class="calc-label">Para APROVAR DIRETO (Média 7):</div><div style="color:#4ade80; font-size:1.2rem; font-weight:800;">Precisa de ${precisaPara7} na N2</div></div>
+                    <div><div class="calc-label">Para ir para FINAL (Mínimo):</div><div style="color:#facc15; font-size:1.2rem; font-weight:800;">Precisa de ${precisaPara4} na N2</div><small style="color:#94a3b8;">Menor que isso reprova direto.</small></div>
+                `;
+            }
+            
+            const media = (n1 + n2) / 2;
+            let situacao = "", cor = "", extraInfo = "";
+            
+            if (media >= 7) { 
+                situacao = "APROVADO POR MÉDIA"; 
+                cor = "#22c55e"; 
+                extraInfo = "Parabéns! Você já passou."; 
+            } else if (media < 4) { 
+                situacao = "REPROVADO"; 
+                cor = "#ef4444"; 
+                extraInfo = "Média inferior a 4.0."; 
+            } else { 
+                situacao = "AVALIAÇÃO FINAL"; 
+                cor = "#f97316"; 
+                const precisaAF = (10 - media).toFixed(1); 
+                extraInfo = `<div style="margin-top:10px; font-size:1.1rem;">Precisa tirar <span style="color:white; font-weight:800; font-size:1.4rem;">${precisaAF}</span> na Final.</div>`; 
+            }
+
+            return `
+                <div class="calc-row"><span class="calc-label">Nota Unidade 1</span> <span class="calc-val">${n1}</span></div>
+                <div class="calc-row"><span class="calc-label">Nota Unidade 2</span> <span class="calc-val">${n2}</span></div>
+                <div class="calc-row" style="border:none; margin-top:15px;"><span class="calc-label">MÉDIA PARCIAL</span> <span class="calc-res" style="color:${cor}">${media.toFixed(1)}</span></div>
+                <div style="background:${cor}20; border:1px solid ${cor}; color:${cor}; padding:15px; border-radius:8px; text-align:center; font-weight:700; margin-top:10px;">${situacao}${extraInfo}</div>
+            `;
+        }
+
+        function checkGrades() {
+            let matricula = aluno.dados ? aluno.dados.matricula : null;
+            const table = document.querySelector('table.tabelaRelatorio');
+            
+            if (!table) {
+                alert("⚠️ Tabela de notas não encontrada.\n\nEntre na disciplina e clique em 'Ver Notas' ou 'Participantes'.");
                 return;
             }
 
-            let htmlContent = "";
-            
-            if (n1 === null && n2 === null) {
-                htmlContent = "<p>Nenhuma nota lançada ainda.</p>";
-            } else if (n1 !== null && n2 === null) {
-                // SÓ TEM N1
-                const precisaPara7 = Math.max(0, 14 - n1).toFixed(1); // (N1+N2)/2 = 7 -> N2 = 14-N1
-                const precisaPara4 = Math.max(0, 8 - n1).toFixed(1);  // (N1+N2)/2 = 4 -> N2 = 8-N1
-                
-                htmlContent = `
-                    <div class="calc-row"><span class="calc-label">Nota Unidade 1</span> <span class="calc-val">${n1}</span></div>
-                    <hr style="border-color:rgba(255,255,255,0.1); margin:15px 0;">
-                    
-                    <div style="margin-bottom:15px;">
-                        <div class="calc-label">Para APROVAR DIRETO (Média 7):</div>
-                        <div style="color:#4ade80; font-size:1.2rem; font-weight:800;">Precisa de ${precisaPara7} na N2</div>
-                    </div>
-                    
-                    <div>
-                        <div class="calc-label">Para ir para FINAL (Mínimo):</div>
-                        <div style="color:#facc15; font-size:1.2rem; font-weight:800;">Precisa de ${precisaPara4} na N2</div>
-                        <small style="color:#94a3b8;">Menor que isso reprova direto.</small>
-                    </div>
-                `;
-            } else if (n1 !== null && n2 !== null) {
-                // TEM N1 E N2
-                const media = (n1 + n2) / 2;
-                let situacao = "", cor = "";
-                let extraInfo = "";
+            const { userFound, n1, n2 } = extractUserGrades(table, matricula);
 
-                if (media >= 7) {
-                    situacao = "APROVADO POR MÉDIA"; cor = "#22c55e";
-                    extraInfo = "Parabéns! Você já passou.";
-                } else if (media < 4) {
-                    situacao = "REPROVADO"; cor = "#ef4444";
-                    extraInfo = "Média inferior a 4.0.";
-                } else {
-                    situacao = "AVALIAÇÃO FINAL"; cor = "#f97316";
-                    // Calculo da Final: (Media + AF) / 2 = 5  -> AF = 10 - Media
-                    const precisaAF = (10 - media).toFixed(1);
-                    extraInfo = `<div style="margin-top:10px; font-size:1.1rem;">Precisa tirar <span style="color:white; font-weight:800; font-size:1.4rem;">${precisaAF}</span> na Final.</div>`;
-                }
-
-                htmlContent = `
-                    <div class="calc-row"><span class="calc-label">Nota Unidade 1</span> <span class="calc-val">${n1}</span></div>
-                    <div class="calc-row"><span class="calc-label">Nota Unidade 2</span> <span class="calc-val">${n2}</span></div>
-                    <div class="calc-row" style="border:none; margin-top:15px;"><span class="calc-label">MÉDIA PARCIAL</span> <span class="calc-res" style="color:${cor}">${media.toFixed(1)}</span></div>
-                    
-                    <div style="background:${cor}20; border:1px solid ${cor}; color:${cor}; padding:15px; border-radius:8px; text-align:center; font-weight:700; margin-top:10px;">
-                        ${situacao}
-                        ${extraInfo}
-                    </div>
-                `;
+            if (!userFound) { 
+                alert("⚠️ Sua matrícula (" + (matricula || 'N/A') + ") não foi encontrada nesta tabela."); 
+                return; 
             }
 
+            const htmlContent = generateGradeHtml(n1, n2);
             showModal("Calculadora de Notas", htmlContent);
         }
 
-        // --- HELPER PARA MODAL GENERICO ---
         function showModal(title, content) {
             const id = 'modal-generic-ultimate';
-            let modal = document.getElementById(id);
-            if(modal) modal.remove();
-            
-            modal = document.createElement('div');
+            const existingModal = document.getElementById(id);
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            const modal = document.createElement('div');
             modal.id = id;
-            modal.style.cssText = `display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999999; align-items:center; justify-content:center; backdrop-filter:blur(3px); font-family: 'Inter', sans-serif;`;
+            modal.style.cssText = `
+                display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.6); z-index: 9999999; align-items: center;
+                justify-content: center; backdrop-filter: blur(3px); font-family: 'Inter', sans-serif;
+            `;
+
             modal.innerHTML = `
-                <div style="background:#1e293b; color:white; width:90%; max-width:400px; border-radius:16px; padding:30px; box-shadow:0 20px 50px rgba(0,0,0,0.4); text-align:center; border:1px solid #334155; position:relative;">
-                    <button onclick="document.getElementById('${id}').remove()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:#64748b; font-size:1.5rem; cursor:pointer;">&times;</button>
-                    <h2 style="margin:0 0 20px 0; color:white !important; font-size:1.3rem; font-weight:700; background:transparent !important; border:none !important;">${title}</h2>
+                <div style="background: #1e293b; color: white; width: 90%; max-width: 400px; border-radius: 16px; padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); text-align: center; border: 1px solid #334155; position: relative;">
+                    <button id="close-${id}" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: #64748b; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                    <h2 style="margin: 0 0 20px 0; color: white !important; font-size: 1.3rem; font-weight: 700; background: transparent !important; border: none !important;">${title}</h2>
                     ${content}
-                </div>`;
+                </div>
+            `;
+
             document.body.appendChild(modal);
-            modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+
+            document.getElementById(`close-${id}`).addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
         }
 
-        document.getElementById('btn-calc-freq').addEventListener('click', checkFrequency);
-        document.getElementById('btn-calc-notas').addEventListener('click', checkGrades);
+        if (window.location.href.includes("/ava/")) {
+            initInternalPage();
+
+            console.log("SIGAA Ultimate: Modo Turma Virtual Ativado");
+
+        } else {
+            initInternalPage();
+        }
     }
 
-    // --- FUNÇÃO COMPARTILHADA DE TEMAS ---
     function criarModalTemas() {
-        const exist = document.getElementById('modal-temas'); if(exist) exist.remove();
-        const modal = document.createElement('div'); modal.id = 'modal-temas';
-        modal.style.cssText = `display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(3px);`;
-        let botoesHTML = '';
-        for (const [key, theme] of Object.entries(PALETTES)) {
-            botoesHTML += `<button class="btn-theme" data-theme="${key}" style="background:transparent; border:2px solid var(--border-color); color:var(--text-primary); padding:15px; border-radius:12px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:10px; width:100px; transition:all 0.2s;"><div style="width:30px; height:30px; background:${theme.primary}; border-radius:50%;"></div><span style="font-size:0.8rem; font-weight:600;">${theme.name}</span></button>`;
-        }
-        modal.innerHTML = `<div style="background:var(--card-bg); border-radius:16px; padding:30px; max-width:500px; width:90%; position:relative; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);"><button id="btn-fechar-temas" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-secondary);">&times;</button><h2 style="margin:0 0 20px 0; color:var(--text-primary) !important; font-size:1.5rem; font-weight:700; background:transparent !important; border:none !important;">Aparência</h2><div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; background:var(--bg-color); padding:10px 15px; border-radius:8px;"><span style="font-weight:600; color:var(--text-primary);">Modo Escuro</span><label class="switch"><input type="checkbox" id="theme-switch" ${isDarkMode ? 'checked' : ''}><span class="slider round"></span></label></div><div style="display:flex; flex-wrap:wrap; gap:15px; justify-content:center;">${botoesHTML}</div></div>`;
+        const id = 'modal-temas';
+        const existingModal = document.getElementById(id);
+        if (existingModal) existingModal.remove();
+
+        const modal = document.createElement('div');
+        modal.id = id;
+        modal.style.cssText = `
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 99999; align-items: center;
+            justify-content: center; backdrop-filter: blur(3px);
+        `;
+
+        const themeButtonsHtml = Object.entries(PALETTES).map(([key, theme]) => {
+            return `
+                <button class="btn-theme" data-theme="${key}" style="background:transparent; border:2px solid var(--border-color); color:var(--text-primary); padding:15px; border-radius:12px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:10px; width:100px; transition:all 0.2s;">
+                    <div style="width:30px; height:30px; background:${theme.primary}; border-radius:50%;"></div>
+                    <span style="font-size:0.8rem; font-weight:600;">${theme.name}</span>
+                </button>
+            `;
+        }).join('');
+
+        modal.innerHTML = `
+            <div style="background:var(--card-bg); border-radius:16px; padding:30px; max-width:500px; width:90%; position:relative; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);">
+                <button id="btn-fechar-temas" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-secondary);">&times;</button>
+                <h2 style="margin:0 0 20px 0; color:var(--text-primary) !important; font-size:1.5rem; font-weight:700; background:transparent !important; border:none !important;">Aparência</h2>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; background:var(--bg-color); padding:10px 15px; border-radius:8px;">
+                    <span style="font-weight:600; color:var(--text-primary);">Modo Escuro</span>
+                    <label class="switch">
+                        <input type="checkbox" id="theme-switch" ${isDarkMode ? 'checked' : ''}>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:15px; justify-content:center;">
+                    ${themeButtonsHtml}
+                </div>
+            </div>
+        `;
+
         document.body.appendChild(modal);
-        document.getElementById('btn-fechar-temas').onclick = () => modal.style.display = 'none';
-        modal.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
-        const btns = modal.querySelectorAll('.btn-theme');
-        btns.forEach(btn => {
-            if(btn.dataset.theme === currentPalette) btn.style.borderColor = 'var(--theme-primary)';
-            btn.onclick = () => { currentPalette = btn.dataset.theme; applyTheme(); btns.forEach(b => b.style.borderColor = 'var(--border-color)'); btn.style.borderColor = 'var(--theme-primary)'; };
+
+        const closeBtn = document.getElementById('btn-fechar-temas');
+        closeBtn.addEventListener('click', () => modal.style.display = 'none');
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+        const themeButtons = modal.querySelectorAll('.btn-theme');
+        themeButtons.forEach(btn => {
+            if (btn.dataset.theme === currentPalette) btn.style.borderColor = 'var(--theme-primary)';
+            btn.addEventListener('click', () => {
+                currentPalette = btn.dataset.theme;
+                applyTheme();
+                themeButtons.forEach(b => b.style.borderColor = 'var(--border-color)');
+                btn.style.borderColor = 'var(--theme-primary)';
+            });
         });
-        document.getElementById('theme-switch').addEventListener('change', (e) => { isDarkMode = e.target.checked; applyTheme(); });
+
+        const themeSwitch = document.getElementById('theme-switch');
+        themeSwitch.addEventListener('change', (e) => {
+            isDarkMode = e.target.checked;
+            applyTheme();
+        });
     }
 
 })();
